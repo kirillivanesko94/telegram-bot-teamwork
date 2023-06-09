@@ -8,7 +8,7 @@ import javax.persistence.Id;
 
 @Entity
 @Data
-public class UsersShelter {
+public class Users {
     @Id
     @GeneratedValue
     private Long id;
