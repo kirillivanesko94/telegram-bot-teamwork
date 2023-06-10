@@ -1,8 +1,13 @@
 package pro.sky.telegrambotshelter.service;
 
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambotshelter.entity.Shelter;
 import pro.sky.telegrambotshelter.repository.ShelterRepository;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShelterService {
@@ -12,9 +17,7 @@ public class ShelterService {
         this.shelterRepository = shelterRepository;
     }
 
-    public String getInfo(ShelterType type) {
-        // Инфу надо доставать из БД
-        // сейчас просто заглушка
-        return "Тут пока что пусто :(";
+    public List<Shelter> getInfo(ShelterType type) {
+        return shelterRepository.findAll().stream().filter(x -> x.getAnimals().contains(type)).collect(Collectors.toList());
     }
 }

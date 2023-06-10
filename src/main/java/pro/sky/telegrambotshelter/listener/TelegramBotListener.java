@@ -6,14 +6,21 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambotshelter.entity.Animal;
+import pro.sky.telegrambotshelter.entity.Shelter;
+import pro.sky.telegrambotshelter.repository.AnimalRepository;
+import pro.sky.telegrambotshelter.repository.ShelterRepository;
 import pro.sky.telegrambotshelter.service.ShelterService;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TelegramBotListener implements UpdatesListener {
 
     private static final String DOG_SHELTER_BUTTON = "Приют для собак";
@@ -22,10 +29,11 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_CHOOSE_SHELTER_CATS = "Choose_Shelter_Cats";
     private static final String CALLBACK_SHOW_INFO_CATS = "SHOW_INFO_CATS";
     private static final String CALLBACK_SHOW_INFO_DOGS = "SHOW_INFO_DOGS";
+    private static final String SELECTED_SHELTER = "SELECTED_SHELTER";
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
-    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService) {
+    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService, AnimalRepository animalRepository, ShelterRepository shelterRepository) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
     }
@@ -64,21 +72,68 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    /**
+     * метод обрабаотывает команнды
+     * @param update
+     */
+
     private void processCallbackQuery(Update update) {
         Long chatId = update.callbackQuery().message().chat().id();
+        switch (update.callbackQuery().data()) {
+            case (CALLBACK_CHOOSE_SHELTER_DOGS):
+                createButton(chatId, CALLBACK_SHOW_INFO_DOGS);
+                break;
+            case (CALLBACK_CHOOSE_SHELTER_CATS):
+                createButton(chatId, CALLBACK_SHOW_INFO_CATS);
+                break;
+            case (CALLBACK_SHOW_INFO_DOGS):
+                sendShelterInfo(chatId, ShelterType.DOG,0);
+                break;
+            case (CALLBACK_SHOW_INFO_CATS):
+                sendShelterInfo(chatId, ShelterType.CAT,0);
+                break;
+            case (SELECTED_SHELTER):
 
-        if (CALLBACK_CHOOSE_SHELTER_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButton(chatId, CALLBACK_SHOW_INFO_DOGS);
-        } else if (CALLBACK_CHOOSE_SHELTER_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButton(chatId, CALLBACK_SHOW_INFO_CATS);
-        } else if (CALLBACK_SHOW_INFO_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
-            sendShelterInfo(chatId, ShelterType.DOG);
-        } else if (CALLBACK_SHOW_INFO_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
-            sendShelterInfo(chatId, ShelterType.CAT);
-        } else {
-            failedMessage(chatId);
+                break;
+            case ("animal"):
+                break;
+            case ("report"):
+                break;
+            default:
+                if (update.callbackQuery().data().split(" ").length == 3) {
+                    String[] array = update.callbackQuery().data().split(" ");
+                    if (array[0].equals(SELECTED_SHELTER)){
+                        try {
+                            returnInfoFromShelter(Integer.parseInt(array[1]));
+                        }catch (NumberFormatException e) {
+                            log.error("String format is not suitable");
+                        }
+                    }
+                }
+                if (update.callbackQuery().data().split(" ").length == 2) {
+                    String[] array = update.callbackQuery().data().split(" ");
+                    if (array[0].equals("nextShelterOf")){
+                        ShelterType type = array[1].equals("DOG")
+                                ? ShelterType.DOG
+                                : ShelterType.CAT;
+                        try {
+                            sendShelterInfo(chatId, type, Integer.parseInt(array[2]));
+                        }catch (NumberFormatException e){
+                            log.error("String format is not suitable");
+                        }
+                    }
+                }
+                failedMessage(chatId);
+                break;
         }
+
     }
+
+    /**
+     *  метод обрабатывает оманду выбора питомника
+     * @param chatId
+     * @param callbackShowInfoShelter
+     */
 
     private void createButton(Long chatId, String callbackShowInfoShelter) {
         String msg = "Пожалуйста, выберете следующее действие";
@@ -93,16 +148,50 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
-
-    private void sendShelterInfo(Long chatId, ShelterType type) {
-        //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
-        SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
-        telegramBot.execute(sendMessage);
+    /**
+     *метод выдает полную информацию о питомнике , выдавая информацию о питомнике по списку
+     * @param chatId
+     * @param type
+     * @param page
+     */
+    private void sendShelterInfo(Long chatId, ShelterType type, int page) {
+        List<Shelter> sheltersList = shelterService.getInfo(type);
+        SendMessage sendMessage = new SendMessage(chatId, sheltersList.get(page).toString());
+        if (sheltersList.size() != 0) {
+            if (page == 0) {
+                InlineKeyboardButton[] buttonsRowForDogsShelter = {
+                        new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                };
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+                sendMessage.replyMarkup(inlineKeyboard);
+            }
+            if (page == sheltersList.size() - 1) {
+                InlineKeyboardButton[] buttonsRowForDogsShelter = {
+                        new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                };
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+                sendMessage.replyMarkup(inlineKeyboard);
+            } else {
+                InlineKeyboardButton[] buttonsRowForDogsShelter = {
+                        new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
+                        new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                };
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+                sendMessage.replyMarkup(inlineKeyboard);
+            }
+            telegramBot.execute(sendMessage);
+        }
     }
     private void failedMessage(Long chatId){
         String msg = "Извините, я не понимаю что делать";
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
+    }
+    private void  returnInfoFromShelter(int shelterId){
+
     }
 }
 
