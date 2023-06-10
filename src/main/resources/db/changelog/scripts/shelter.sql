@@ -1,1 +1,0 @@
-CREATE TABLE shelter (id SERIAL PRIMARY KEY, name TEXT, address TEXT, description TEXT);
