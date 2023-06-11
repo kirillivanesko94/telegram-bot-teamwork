@@ -2,6 +2,7 @@ package pro.sky.telegrambotshelter.entity;
 
 import lombok.Data;
 import lombok.ToString;
+import pro.sky.telegrambotshelter.shelter.ShelterType;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ public class Animal {
     @GeneratedValue
     private Long id;
 
-    private String typeAnimal;
+    private ShelterType typeAnimal;
     private String descAnimal;
     private String instruction;
 

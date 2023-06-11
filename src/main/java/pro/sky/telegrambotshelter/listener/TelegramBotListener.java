@@ -48,7 +48,9 @@ public class TelegramBotListener implements UpdatesListener {
         updates.forEach(update -> {
             if (update.message() != null && "/start".equals(update.message().text())) {
                 startMessage(update);
+                log.info("start");
             } else if (update.callbackQuery() != null) {
+                log.info("processCallbackQuery start");
                 processCallbackQuery(update);
             } else {
                 // Потенциально NPE потому что message может быть null
@@ -82,15 +84,19 @@ public class TelegramBotListener implements UpdatesListener {
         switch (update.callbackQuery().data()) {
             case (CALLBACK_CHOOSE_SHELTER_DOGS):
                 createButton(chatId, CALLBACK_SHOW_INFO_DOGS);
+                log.info("CALLBACK_SHOW_INFO_DOGS");
                 break;
             case (CALLBACK_CHOOSE_SHELTER_CATS):
                 createButton(chatId, CALLBACK_SHOW_INFO_CATS);
+                log.info("CALLBACK_SHOW_INFO_CATS");
                 break;
             case (CALLBACK_SHOW_INFO_DOGS):
                 sendShelterInfo(chatId, ShelterType.DOG,0);
+                log.info("sendShelterInfo" +  " DOG");
                 break;
             case (CALLBACK_SHOW_INFO_CATS):
                 sendShelterInfo(chatId, ShelterType.CAT,0);
+                log.info("sendShelterInfo" +  " CAT");
                 break;
             case ("animal"):
                 break;
