@@ -19,6 +19,4 @@ public class Users {
     private String email;
     private int phone;
     private Long chatId;
-    private int shelterId;
-
 }

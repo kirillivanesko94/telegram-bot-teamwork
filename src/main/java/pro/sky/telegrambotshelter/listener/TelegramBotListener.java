@@ -149,7 +149,7 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     *метод выдает полную информацию о питомнике , выдавая информацию о питомнике по списку
+     *метод выдает полную информацию о питомнике , выдавая информацию о питомнике по списку, затем выбирет питтомник и возвращает его id
      * @param chatId
      * @param type
      * @param page
@@ -158,10 +158,17 @@ public class TelegramBotListener implements UpdatesListener {
         List<Shelter> sheltersList = shelterService.getInfo(type);
         SendMessage sendMessage = new SendMessage(chatId, sheltersList.get(page).toString());
         if (sheltersList.size() != 0) {
+            if (sheltersList.size() == 1) {
+                InlineKeyboardButton[] buttonsRowForDogsShelter = {
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
+                };
+                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+                sendMessage.replyMarkup(inlineKeyboard);
+            }
             if (page == 0) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
                         new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
@@ -169,7 +176,7 @@ public class TelegramBotListener implements UpdatesListener {
             if (page == sheltersList.size() - 1) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
                         new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
@@ -177,7 +184,7 @@ public class TelegramBotListener implements UpdatesListener {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
                         new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
                         new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + page)
+                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
