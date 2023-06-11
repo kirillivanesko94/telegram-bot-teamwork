@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@ToString
 public class Animal {
     @Id
     @GeneratedValue

@@ -110,19 +110,6 @@ public class TelegramBotListener implements UpdatesListener {
                         }
                     }
                 }
-                if (update.callbackQuery().data().split(" ").length == 2) {
-                    String[] array = update.callbackQuery().data().split(" ");
-                    if (array[0].equals("nextShelterOf")){
-                        ShelterType type = array[1].equals("DOG")
-                                ? ShelterType.DOG
-                                : ShelterType.CAT;
-                        try {
-                            sendShelterInfo(chatId, type, Integer.parseInt(array[2]));
-                        }catch (NumberFormatException e){
-                            log.error("String format is not suitable");
-                        }
-                    }
-                }
                 failedMessage(chatId);
                 break;
         }
@@ -130,7 +117,7 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     *  метод обрабатывает оманду выбора питомника
+     *  метод обрабатывает команду выбора питомника
      * @param chatId
      * @param callbackShowInfoShelter
      */
@@ -149,7 +136,7 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     *метод выдает полную информацию о питомнике , выдавая информацию о питомнике по списку, затем выбирет питтомник и возвращает его id
+     *метод выдает полную информацию о питомнике или питогмниках , если их несколько
      * @param chatId
      * @param type
      * @param page
@@ -159,21 +146,15 @@ public class TelegramBotListener implements UpdatesListener {
         SendMessage sendMessage = new SendMessage(chatId, sheltersList.get(page).toString());
         if (sheltersList.size() != 0) {
             if (sheltersList.size() == 1) {
-                InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
-                };
-                InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
-                sendMessage.replyMarkup(inlineKeyboard);
             }
-            if (page == 0) {
+            else if (page == 0) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
                         new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
             }
-            if (page == sheltersList.size() - 1) {
+            else if (page == sheltersList.size() - 1) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
                         new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
                         new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
