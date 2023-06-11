@@ -29,7 +29,7 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_CHOOSE_SHELTER_CATS = "Choose_Shelter_Cats";
     private static final String CALLBACK_SHOW_INFO_CATS = "SHOW_INFO_CATS";
     private static final String CALLBACK_SHOW_INFO_DOGS = "SHOW_INFO_DOGS";
-    private static final String SELECTED_SHELTER = "SELECTED_SHELTER";
+    private static final String NEXT_SHELTER = "nextShelterOf";
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
@@ -92,9 +92,6 @@ public class TelegramBotListener implements UpdatesListener {
             case (CALLBACK_SHOW_INFO_CATS):
                 sendShelterInfo(chatId, ShelterType.CAT,0);
                 break;
-            case (SELECTED_SHELTER):
-
-                break;
             case ("animal"):
                 break;
             case ("report"):
@@ -102,10 +99,13 @@ public class TelegramBotListener implements UpdatesListener {
             default:
                 if (update.callbackQuery().data().split(" ").length == 3) {
                     String[] array = update.callbackQuery().data().split(" ");
-                    if (array[0].equals(SELECTED_SHELTER)){
+                    if (array[0].equals(NEXT_SHELTER)){
+                        ShelterType type = array[1].equals("DOG")
+                                ? ShelterType.DOG
+                                : ShelterType.CAT;
                         try {
-                            returnInfoFromShelter(Integer.parseInt(array[1]));
-                        }catch (NumberFormatException e) {
+                            sendShelterInfo(chatId, type, Integer.parseInt(array[2]));
+                        }catch (NumberFormatException e){
                             log.error("String format is not suitable");
                         }
                     }
@@ -117,7 +117,7 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     *  метод обрабатывает команду выбора питомника
+     *  метод обрабатывает оманду выбора питомника
      * @param chatId
      * @param callbackShowInfoShelter
      */
@@ -136,7 +136,7 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     *метод выдает полную информацию о питомнике или питогмниках , если их несколько
+     *метод выдает полную информацию о питомнике , выдавая информацию о питомнике по списку, затем выбирет питтомник и возвращает его id
      * @param chatId
      * @param type
      * @param page
@@ -149,23 +149,22 @@ public class TelegramBotListener implements UpdatesListener {
             }
             else if (page == 0) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                        new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
+                        new InlineKeyboardButton("Следующий питомник").callbackData(NEXT_SHELTER + " " + type.toString() + " " + (page + 1)),
+
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
             }
-            else if (page == sheltersList.size() - 1) {
+            if (page == sheltersList.size() - 1) {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                        new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
+                        new InlineKeyboardButton("Предыдущий питомник").callbackData(NEXT_SHELTER + " " + type.toString() + " " + (page - 1))
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
             } else {
                 InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                        new InlineKeyboardButton("Следующий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page + 1)),
-                        new InlineKeyboardButton("Предыдущий питомник").callbackData("nextShelterOf" + " " + type.toString() + " " + (page - 1)),
-                        new InlineKeyboardButton("Выбрать питомник").callbackData("SELECTED_SHELTER" + " " + sheltersList.get(page).getId())
+                        new InlineKeyboardButton("Следующий питомник").callbackData(NEXT_SHELTER + " " + type.toString() + " " + (page + 1)),
+                        new InlineKeyboardButton("Предыдущий питомник").callbackData(NEXT_SHELTER + " " + type.toString() + " " + (page - 1)),
                 };
                 InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
                 sendMessage.replyMarkup(inlineKeyboard);
