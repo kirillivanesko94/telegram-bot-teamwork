@@ -29,7 +29,6 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_CHOOSE_SHELTER_CATS = "Choose_Shelter_Cats";
     private static final String CALLBACK_SHOW_INFO_CATS = "SHOW_INFO_CATS";
     private static final String CALLBACK_SHOW_INFO_DOGS = "SHOW_INFO_DOGS";
-    private static final String SELECTED_SHELTER = "SELECTED_SHELTER";
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
