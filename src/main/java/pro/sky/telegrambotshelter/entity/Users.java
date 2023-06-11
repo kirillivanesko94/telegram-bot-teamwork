@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.Collection;
 
 @Entity
 @Data
@@ -17,5 +19,8 @@ public class Users {
     private String email;
     private int phone;
     private Long chatId;
+
+    @OneToMany(mappedBy = "users")
+    private Collection<Report> reports;
 
 }
