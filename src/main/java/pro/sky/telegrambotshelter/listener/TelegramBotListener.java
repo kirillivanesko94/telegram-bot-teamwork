@@ -109,9 +109,9 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     * Метод для создания кнопок раздела "Отчет"
+     * Method to create menu Report
      *
-     * @param chatId - идентификатор чата
+     * @param chatId - chat identifier
      */
     private void createButtonsReportMenu(Long chatId) {
         String msg = "Пожалуйста, выберете следующее действие";
@@ -132,8 +132,8 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
-     * Метод для отправки информационного сообщения после нажатия кнопки "Отправить отчет"
-     * @param chatId - идентификатор чата
+     * Method to send info after clicking button Send Report
+     * @param chatId - chat identifier
      */
     private void sendReportMessage(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, "В ответном сообщении напиши ежедневный отчет по форме. " +
@@ -143,7 +143,8 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Метод для отправки формы отчета после нажатия кнопки "Форма отчета"
-     * @param chatId - идентификатор чата
+     * Method to send report form after clicking button Report Form
+     * @param chatId - chat identifier
      */
     private void sendReportForm(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, "Необходимо описать:\n" +

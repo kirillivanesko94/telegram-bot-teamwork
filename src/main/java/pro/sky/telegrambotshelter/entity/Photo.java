@@ -3,26 +3,26 @@ package pro.sky.telegrambotshelter.entity;
 import javax.persistence.*;
 
 /**
- * Класс сущности Фото для отчета
- * @autor Егор
+ * Entity class for report photo
+ * @autor Egor
  */
 @Entity
 public class Photo {
-    /** Поле id */
+    /** Field identifier */
     @Id
     @GeneratedValue
     private Long id;
-    /** Поле путь файла */
+    /** Field file path */
     private String filePath;
-    /** Поле размер файла */
+    /** Field file size */
     private Long fileSize;
-    /** Поле тип медиа файла */
+    /** Field file media type */
     private String mediaType;
 
-    /** Поле данные файла */
+    /** Field file data */
     private byte[] data;
 
-    /** Поле отчет, в котором находится фото*/
+    /** Field report*/
     @OneToOne
     private Report report;
 }
