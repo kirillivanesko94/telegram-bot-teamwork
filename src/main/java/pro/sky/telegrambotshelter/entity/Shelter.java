@@ -31,4 +31,5 @@ public class Shelter {
     private String description;
     private String instruction;
 
+
 }
