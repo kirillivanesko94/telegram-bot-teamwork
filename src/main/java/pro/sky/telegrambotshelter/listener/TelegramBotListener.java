@@ -15,11 +15,19 @@ import pro.sky.telegrambotshelter.shelter.ShelterType;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+/**
+ * This class is responsible for handling incoming updates
+ */
+
 @Service
 public class TelegramBotListener implements UpdatesListener {
-
+    /**
+     * logger to get information about the received update
+     */
     private Logger logger = LoggerFactory.getLogger(TelegramBotListener.class);
-
+    /**
+     * constants for defining menu buttons in sent messages and designating CallbackQuery
+     */
     private static final String DOG_SHELTER_BUTTON = "Приют для собак";
     private static final String CAT_SHELTER_BUTTON = "Приют для кошек";
     private static final String CALLBACK_CHOOSE_SHELTER_DOGS = "Choose_Shelter_Dogs";
@@ -38,10 +46,19 @@ public class TelegramBotListener implements UpdatesListener {
         this.shelterService = shelterService;
     }
 
+    /**
+     * the method of installing the telegram listener bot
+     */
     @PostConstruct
     public void init() {
         telegramBot.setUpdatesListener(this);
     }
+
+    /**
+     * update processing method
+     * @param updates available updates
+     * @return confirmation of all received updates for continuous receipt of updates
+     */
 
     @Override
     public int process(List<Update> updates) {
@@ -59,6 +76,10 @@ public class TelegramBotListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
+    /**
+     * Method for sending a welcome message
+     * @param update received update
+     */
     private void startMessage(Update update) {
         String name = update.message().chat().firstName();
         String msg = "Привет, " + name + "! Пожалуйста, выбери приют:";
@@ -73,13 +94,18 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    /**
+     * Method for processing incoming
+     * @param update received update
+     */
+
     private void processCallbackQuery(Update update) {
         Long chatId = update.callbackQuery().message().chat().id();
 
         if (CALLBACK_CHOOSE_SHELTER_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButton(chatId, CALLBACK_SHOW_INFO_DOGS);
+            createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS);
         } else if (CALLBACK_CHOOSE_SHELTER_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButton(chatId, CALLBACK_SHOW_INFO_CATS);
+            createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_CATS);
         } else if (CALLBACK_SHOW_INFO_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterInfo(chatId, ShelterType.DOG);
         } else if (CALLBACK_SHOW_INFO_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
@@ -95,7 +121,13 @@ public class TelegramBotListener implements UpdatesListener {
         }
     }
 
-    private void createButton(Long chatId, String callbackShowInfoShelter) {
+    /**
+     * Method to create menu Info
+     * @param chatId - chat identifier
+     * @param callbackShowInfoShelter - the assigned value of the button, for processing incoming CallbackQuery
+     */
+
+    private void createButtonInfoMenu(Long chatId, String callbackShowInfoShelter) {
         String msg = "Пожалуйста, выберете следующее действие";
         InlineKeyboardButton[] buttonsRowForDogsShelter = {
                 new InlineKeyboardButton("Информация о питомнике").callbackData(callbackShowInfoShelter),
@@ -125,6 +157,12 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    /**
+     * method for sending information about the selected shelter
+     * @param chatId - chat identifier
+     * @param type - Shelter type (Enum)
+     */
+
     private void sendShelterInfo(Long chatId, ShelterType type) {
         //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
@@ -133,6 +171,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to send info after clicking button Send Report
+     *
      * @param chatId - chat identifier
      */
     private void sendReportMessage(Long chatId) {
@@ -144,6 +183,7 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * Метод для отправки формы отчета после нажатия кнопки "Форма отчета"
      * Method to send report form after clicking button Report Form
+     *
      * @param chatId - chat identifier
      */
     private void sendReportForm(Long chatId) {
@@ -153,6 +193,12 @@ public class TelegramBotListener implements UpdatesListener {
                 "Также необходимо прикрепить к сообщению фото питомца.");
         telegramBot.execute(sendMessage);
     }
+
+    /**
+     * The method for sending the default message.
+     * It is used in cases when the user has sent an unprocessed command
+     * @param chatId - chat identifier
+     */
 
     private void failedMessage(Long chatId) {
         String msg = "Извините, я не понимаю что делать";
