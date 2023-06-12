@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.service.ShelterService;
+import pro.sky.telegrambotshelter.service.ShelterVolunteerService;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
+import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -28,8 +30,8 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * constants for defining menu buttons in sent messages and designating CallbackQuery
      */
-    private static final String DOG_SHELTER_BUTTON = "Приют для собак";
-    private static final String CAT_SHELTER_BUTTON = "Приют для кошек";
+    private static final String DOG_SHELTER_BUTTON = "Приют для собак \uD83D\uDC36";
+    private static final String CAT_SHELTER_BUTTON = "Приют для кошек \uD83D\uDC31";
     private static final String CALLBACK_CHOOSE_SHELTER_DOGS = "Choose_Shelter_Dogs";
     private static final String CALLBACK_CHOOSE_SHELTER_CATS = "Choose_Shelter_Cats";
     private static final String CALLBACK_SHOW_INFO_CATS = "SHOW_INFO_CATS";
@@ -38,12 +40,19 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_CHOOSE_SEND_REPORT = "SEND_REPORT";
     private static final String CALLBACK_CHOOSE_FORM_REPORT = "FORM_REPORT";
 
+    //учимся звать волонтера и смайлы
+    private static final String CALLBACK_VOLUNTEER_BUTTON = "Нужна помощь волонтера \uD83D\uDE4F";
+    private static final String CALLBACK_CHOOSE_SHELTER_VOLUNTEER = "CALL_ME_VOLUNTEER";
+    private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
+
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
+    private final ShelterVolunteerService shelterVolunteerService;
 
-    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService) {
+    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService, ShelterVolunteerService shelterVolunteerService) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
+        this.shelterVolunteerService = shelterVolunteerService;
     }
 
     /**
@@ -87,6 +96,8 @@ public class TelegramBotListener implements UpdatesListener {
         InlineKeyboardButton[] buttonsRow = {
                 new InlineKeyboardButton(DOG_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_DOGS),
                 new InlineKeyboardButton(CAT_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_CATS),
+
+                new InlineKeyboardButton(CALLBACK_VOLUNTEER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_VOLUNTEER),
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRow);
         SendMessage sendMessage = new SendMessage(id, msg);
@@ -116,7 +127,14 @@ public class TelegramBotListener implements UpdatesListener {
             sendReportMessage(chatId);
         } else if (CALLBACK_CHOOSE_FORM_REPORT.equalsIgnoreCase(update.callbackQuery().data())) {
             sendReportForm(chatId);
-        } else {
+
+//            делаем волонтера
+        } else if (CALLBACK_CHOOSE_SHELTER_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
+            createButtonInfoVolunteerMenu(chatId, CALLBACK_SHOW_INFO_VOLUNTEER);
+        } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
+            sendShelterVolunteerInfo(chatId, ShelterVolunteerType.VOLUNTEER);
+
+    } else {
             failedMessage(chatId);
         }
     }
@@ -135,6 +153,23 @@ public class TelegramBotListener implements UpdatesListener {
                 new InlineKeyboardButton("Отчет").callbackData("report"),
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+        SendMessage sendMessage = new SendMessage(chatId, msg);
+        sendMessage.replyMarkup(inlineKeyboard);
+        telegramBot.execute(sendMessage);
+    }
+    // для волонтера
+    private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
+        String msg = "Как мы можем вам помочь?";
+        InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
+                new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter),
+                new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
+
+        };
+//        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
+        logger.warn("Пришел новый номер" + chatId);
+
+
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
@@ -169,6 +204,12 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    //    для волонтера
+    private void sendShelterVolunteerInfo(Long chatId, ShelterVolunteerType type) {
+        SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(type));
+        telegramBot.execute(sendMessage);
+
+    }
     /**
      * Method to send info after clicking button Send Report
      *
@@ -202,6 +243,12 @@ public class TelegramBotListener implements UpdatesListener {
 
     private void failedMessage(Long chatId) {
         String msg = "Извините, я не понимаю что делать";
+        SendMessage sendMessage = new SendMessage(chatId, msg);
+        telegramBot.execute(sendMessage);
+    }
+    //для волонтера
+    private void volMessage(Long chatId) {
+        String msg = "Тут надо в БД внести ваш номер(временная заглушка)";
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
     }
