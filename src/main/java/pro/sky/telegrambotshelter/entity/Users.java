@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.Collection;
 
 /**
  * This class represents information about users,
@@ -23,5 +25,9 @@ public class Users {
     private String email;
     private int phone;
     private Long chatId;
+
+    /** Поле коллекция отчетов пользователя */
+    @OneToMany(mappedBy = "users")
+    private Collection<Report> reports;
 
 }
