@@ -20,6 +20,7 @@ public class Users {
     private int phone;
     private Long chatId;
 
+    /** Поле коллекция отчетов пользователя */
     @OneToMany(mappedBy = "users")
     private Collection<Report> reports;
 
