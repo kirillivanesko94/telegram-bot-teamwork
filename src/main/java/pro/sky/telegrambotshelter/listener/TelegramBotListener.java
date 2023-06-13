@@ -37,6 +37,8 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_SHOW_MENU_REPORT = "REPORT";
     private static final String CALLBACK_CHOOSE_SEND_REPORT = "SEND_REPORT";
     private static final String CALLBACK_CHOOSE_FORM_REPORT = "FORM_REPORT";
+    private static final String CALLBACK_CALL_VOLUNTEER = "CALL_VOLUNTEER";
+    private static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтера";
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
@@ -166,6 +168,11 @@ public class TelegramBotListener implements UpdatesListener {
     private void sendShelterInfo(Long chatId, ShelterType type) {
         //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
+        InlineKeyboardButton[] buttonsRowForDogsShelter = {
+                new InlineKeyboardButton(CALL_VOLUNTEER_BUTTON).callbackData(CALLBACK_CALL_VOLUNTEER),
+        };
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+        sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
     }
 
