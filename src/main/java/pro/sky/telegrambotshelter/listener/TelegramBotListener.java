@@ -2,13 +2,23 @@ package pro.sky.telegrambotshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetFileResponse;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambotshelter.entity.Report;
+import pro.sky.telegrambotshelter.entity.Users;
+import pro.sky.telegrambotshelter.service.PhotoService;
+import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
@@ -40,10 +50,14 @@ public class TelegramBotListener implements UpdatesListener {
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
+    private final ReportService reportService;
+    private final PhotoService photoService;
 
-    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService) {
+    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService, ReportService reportService, PhotoService photoService) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
+        this.reportService = reportService;
+        this.photoService = photoService;
     }
 
     /**
@@ -56,6 +70,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * update processing method
+     *
      * @param updates available updates
      * @return confirmation of all received updates for continuous receipt of updates
      */
@@ -68,6 +83,10 @@ public class TelegramBotListener implements UpdatesListener {
                 startMessage(update);
             } else if (update.callbackQuery() != null) {
                 processCallbackQuery(update);
+            } else if (update.message().photo() != null) {
+                saveReportPhoto(update);
+            } else if (update.message() != null && "Отчет".equalsIgnoreCase(update.message().text().substring(0, 5))) {
+                saveReport(update);
             } else {
                 // Потенциально NPE потому что message может быть null
                 failedMessage(update.message().chat().id());
@@ -78,6 +97,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for sending a welcome message
+     *
      * @param update received update
      */
     private void startMessage(Update update) {
@@ -96,6 +116,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for processing incoming
+     *
      * @param update received update
      */
 
@@ -123,7 +144,8 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to create menu Info
-     * @param chatId - chat identifier
+     *
+     * @param chatId                  - chat identifier
      * @param callbackShowInfoShelter - the assigned value of the button, for processing incoming CallbackQuery
      */
 
@@ -159,8 +181,9 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * method for sending information about the selected shelter
+     *
      * @param chatId - chat identifier
-     * @param type - Shelter type (Enum)
+     * @param type   - Shelter type (Enum)
      */
 
     private void sendShelterInfo(Long chatId, ShelterType type) {
@@ -175,19 +198,20 @@ public class TelegramBotListener implements UpdatesListener {
      * @param chatId - chat identifier
      */
     private void sendReportMessage(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, "В ответном сообщении напиши ежедневный отчет по форме. " +
+        SendMessage sendMessage = new SendMessage(chatId, "В ответном сообщении напиши слово Отчет " +
+                "и далее ежедневный отчет по форме. " +
                 "Не забудь прикрепить к сообщению фото питомца, спасибо!");
         telegramBot.execute(sendMessage);
     }
 
     /**
-     * Метод для отправки формы отчета после нажатия кнопки "Форма отчета"
      * Method to send report form after clicking button Report Form
      *
      * @param chatId - chat identifier
      */
     private void sendReportForm(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, "Необходимо описать:\n" +
+        SendMessage sendMessage = new SendMessage(chatId, "Вначале напиши слово Отчет " +
+                "и далее необходимо описать:\n" +
                 "- рацион питомца\n- общее самочувствие и привыкание к новому месту\n" +
                 "- изменения в поведении: отказ от старых привычек, приобретение новых.\n" +
                 "Также необходимо прикрепить к сообщению фото питомца.");
@@ -195,8 +219,45 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     /**
+     * Method to save report in BD
+     * @param update - update from chat-bot
+     */
+    private void saveReport(Update update) {
+        Report report = new Report();
+        report.setReportText(update.message().text().substring(5));
+        //заглушка - пока не будет реализовано сохранение user в БД
+        Users fakeUser = new Users();
+        fakeUser.setId(1L);
+        report.setUsers(fakeUser);
+        reportService.reportSave(report);
+        String msg = "Текстовая часть отчета принята, в ответном сообщении пришлите фото питомца";
+        SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
+        telegramBot.execute(sendMessage);
+    }
+
+    /**
+     * Method to save report photo in BD
+     * @param update - update from chat-bot
+     */
+    private void saveReportPhoto(Update update) {
+        PhotoSize[] photo = update.message().photo();
+
+        GetFile request = new GetFile(photo[3].fileId());
+        GetFileResponse getFileResponse = telegramBot.execute(request);
+        File file = getFileResponse.file();
+        reportService.photoSave(file);
+        String msg = "Отчет принят, спасибо!";
+        SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
+        telegramBot.execute(sendMessage);
+//        SendPhoto sendPhoto = new SendPhoto(update.message().chat().id(), telegramBot.getFullFilePath(file));
+//        telegramBot.execute(sendPhoto);
+//        logger.info("Method sendPhoto was invoked");
+    }
+
+    /**
      * The method for sending the default message.
      * It is used in cases when the user has sent an unprocessed command
+     *
      * @param chatId - chat identifier
      */
 

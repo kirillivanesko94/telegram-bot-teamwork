@@ -1,5 +1,6 @@
 package pro.sky.telegrambotshelter.entity;
 
+import com.pengrad.telegrambot.model.File;
 import lombok.Data;
 import pro.sky.telegrambotshelter.entity.Photo;
 
@@ -24,5 +25,7 @@ public class Report {
 
     /** Field report text */
     private String reportText;
+
+    private File file;
 
 }
