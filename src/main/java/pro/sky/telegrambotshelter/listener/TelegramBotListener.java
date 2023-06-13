@@ -200,7 +200,7 @@ public class TelegramBotListener implements UpdatesListener {
     private void sendReportMessage(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, "В ответном сообщении напиши слово Отчет " +
                 "и далее ежедневный отчет по форме. " +
-                "Не забудь прикрепить к сообщению фото питомца, спасибо!");
+                "Во втором сообщении пришли фото питомца, спасибо!");
         telegramBot.execute(sendMessage);
     }
 
@@ -214,12 +214,12 @@ public class TelegramBotListener implements UpdatesListener {
                 "и далее необходимо описать:\n" +
                 "- рацион питомца\n- общее самочувствие и привыкание к новому месту\n" +
                 "- изменения в поведении: отказ от старых привычек, приобретение новых.\n" +
-                "Также необходимо прикрепить к сообщению фото питомца.");
+                "В следующем сообщении необходимо прислать фото питомца.");
         telegramBot.execute(sendMessage);
     }
 
     /**
-     * Method to save report in BD
+     * Method to save report text
      * @param update - update from chat-bot
      */
     private void saveReport(Update update) {
@@ -229,14 +229,14 @@ public class TelegramBotListener implements UpdatesListener {
         Users fakeUser = new Users();
         fakeUser.setId(1L);
         report.setUsers(fakeUser);
-        reportService.reportSave(report);
-        String msg = "Текстовая часть отчета принята, в ответном сообщении пришлите фото питомца";
+        reportService.reportTextSave(report);
+        String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
         telegramBot.execute(sendMessage);
     }
 
     /**
-     * Method to save report photo in BD
+     * Method to save report photo
      * @param update - update from chat-bot
      */
     private void saveReportPhoto(Update update) {
@@ -245,8 +245,8 @@ public class TelegramBotListener implements UpdatesListener {
         GetFile request = new GetFile(photo[3].fileId());
         GetFileResponse getFileResponse = telegramBot.execute(request);
         File file = getFileResponse.file();
-        reportService.photoSave(file);
-        String msg = "Отчет принят, спасибо!";
+        reportService.reportPhotoSave(file);
+        String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
         telegramBot.execute(sendMessage);
 //        SendPhoto sendPhoto = new SendPhoto(update.message().chat().id(), telegramBot.getFullFilePath(file));

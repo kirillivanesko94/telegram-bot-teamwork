@@ -8,12 +8,9 @@ import pro.sky.telegrambotshelter.entity.Report;
 
 /**
  * Repository interface for report
+ *
  * @autor Egor
  */
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    @Query(value = "SELECT * FROM report WHERE id = (SELECT MAX(id) FROM report)", nativeQuery = true)
-    Report findReportByLastId();
-
-//     void updateReportById(Report report, Long id);
 }
