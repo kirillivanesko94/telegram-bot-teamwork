@@ -1,7 +1,6 @@
 package pro.sky.telegrambotshelter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pro.sky.telegrambotshelter.entity.Animal;
 import pro.sky.telegrambotshelter.entity.Shelter;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
@@ -15,5 +14,5 @@ import java.util.Optional;
  * such as creating, reading, updating and deleting.
  */
 public interface ShelterRepository extends JpaRepository<Shelter, Long> {
-    Optional<Shelter> findFirstByTypeAnimal(ShelterType type);
+    Optional<Shelter> findFirstByType(ShelterType type);
 }

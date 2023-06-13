@@ -3,10 +3,7 @@ package pro.sky.telegrambotshelter.entity;
 import lombok.Data;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Collection;
 
 
@@ -22,11 +19,8 @@ public class Shelter {
     @Id
     @GeneratedValue
     private Long id;
-
-    @OneToMany(mappedBy = "shelter")
-    private Collection<Animal> animals;
-
-    private ShelterType typeAnimal;
+    @Enumerated(EnumType.STRING)
+    private ShelterType type;
     private String name;
     private String description;
     private String instruction;

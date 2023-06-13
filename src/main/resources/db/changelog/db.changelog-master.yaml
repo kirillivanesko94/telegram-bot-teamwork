@@ -4,4 +4,9 @@ databaseChangeLog:
       author: Kirill Ivanesko
   - include:
       file: db/changelog/scripts/V1__init.sql
+  - changeSet:
+      id: 2
+      author: Kirill Ivanesko
+  - include:
+      file: db/changelog/scripts/V2__fix_shelter.sql
 
