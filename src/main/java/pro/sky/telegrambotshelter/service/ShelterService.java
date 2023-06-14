@@ -26,7 +26,7 @@ public class ShelterService {
      *
      */
     public String getInfo(ShelterType type) {
-        Optional<Shelter> shelter = shelterRepository.findFirstByTypeAnimal(type);
+        Optional<Shelter> shelter = shelterRepository.findFirstByType(type);
         if (shelter.isPresent()){
             return shelter.get().getDescription();
         }

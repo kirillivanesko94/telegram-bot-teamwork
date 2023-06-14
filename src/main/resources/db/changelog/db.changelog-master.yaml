@@ -1,6 +1,12 @@
 databaseChangeLog:
   - changeSet:
       id: 1
-      author: Aleksey Musaev
-  - includeAll:
-      path: db/changelog/scripts/
+      author: Kirill Ivanesko
+  - include:
+      file: db/changelog/scripts/V1__init.sql
+  - changeSet:
+      id: 2
+      author: Kirill Ivanesko
+  - include:
+      file: db/changelog/scripts/V2__fix_shelter.sql
+
