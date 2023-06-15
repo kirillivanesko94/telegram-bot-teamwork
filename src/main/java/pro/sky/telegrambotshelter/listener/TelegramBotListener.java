@@ -9,9 +9,7 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.GetFileResponse;
-import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,13 +61,14 @@ public class TelegramBotListener implements UpdatesListener {
     private final PhotoService photoService;
     private final ShelterVolunteerService shelterVolunteerService;
 
-    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService, ReportService reportService, PhotoService photoService) {
-    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService, ShelterVolunteerService shelterVolunteerService) {
+    public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService,
+                               ReportService reportService, PhotoService photoService,
+                               ShelterVolunteerService shelterVolunteerService) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
-        this.shelterVolunteerService = shelterVolunteerService;
         this.reportService = reportService;
         this.photoService = photoService;
+        this.shelterVolunteerService = shelterVolunteerService;
     }
 
     /**
@@ -158,7 +157,7 @@ public class TelegramBotListener implements UpdatesListener {
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterVolunteerInfo(chatId, ShelterVolunteerType.VOLUNTEER);
 
-    } else {
+        } else {
             failedMessage(chatId);
         }
     }
@@ -182,6 +181,7 @@ public class TelegramBotListener implements UpdatesListener {
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
     }
+
     // для волонтера
     private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
         String msg = "Как мы можем вам помочь?";
@@ -241,6 +241,7 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
 
     }
+
     /**
      * Method to send info after clicking button Send Report
      *
@@ -269,6 +270,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to save report text
+     *
      * @param update - update from chat-bot
      */
     private void saveReport(Update update) {
@@ -286,6 +288,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to save report photo
+     *
      * @param update - update from chat-bot
      */
     private void saveReportPhoto(Update update) {
@@ -315,6 +318,7 @@ public class TelegramBotListener implements UpdatesListener {
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
     }
+
     //для волонтера
     private void volMessage(Long chatId) {
         String msg = "Тут надо в БД внести ваш номер(временная заглушка)";
