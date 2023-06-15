@@ -110,7 +110,7 @@ public class ReportService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        idUsersWithoutReports
+        idUsersWithoutReportsOverTwoDays
                 .forEach(x -> {
                     telegramBot.execute(
                             new SendMessage(
