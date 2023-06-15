@@ -17,8 +17,6 @@ import java.util.Collection;
 @Data
 public class Shelter {
     @Id
-    @GeneratedValue
-    private Long id;
     @Enumerated(EnumType.STRING)
     private ShelterType type;
     private String name;
