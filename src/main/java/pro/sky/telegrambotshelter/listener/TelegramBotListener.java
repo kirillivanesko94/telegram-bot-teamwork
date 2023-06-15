@@ -5,7 +5,9 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
+import liquibase.pro.packaged.I;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import pro.sky.telegrambotshelter.shelter.ShelterType;
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -98,8 +101,6 @@ public class TelegramBotListener implements UpdatesListener {
         InlineKeyboardButton[] buttonsRow = {
                 new InlineKeyboardButton(DOG_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_DOGS),
                 new InlineKeyboardButton(CAT_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_CATS),
-
-                new InlineKeyboardButton(CALLBACK_VOLUNTEER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_VOLUNTEER),
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRow);
         SendMessage sendMessage = new SendMessage(id, msg);
@@ -153,6 +154,7 @@ public class TelegramBotListener implements UpdatesListener {
                 new InlineKeyboardButton("Информация о питомнике").callbackData(callbackShowInfoShelter),
                 new InlineKeyboardButton("Информация о животных").callbackData("animal"),
                 new InlineKeyboardButton("Отчет").callbackData("report"),
+                new InlineKeyboardButton(CALLBACK_VOLUNTEER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_VOLUNTEER)
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
         SendMessage sendMessage = new SendMessage(chatId, msg);
@@ -161,21 +163,50 @@ public class TelegramBotListener implements UpdatesListener {
     }
     // для волонтера
     private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
-        String msg = "Как мы можем вам помочь?";
-        InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
-                new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter),
-                new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
+    String msg = "Как мы можем вам помочь?";
 
-        };
-//        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
-        logger.warn("Пришел новый номер" + chatId);
+        // создаем лист кнопок общий
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+// создаем лист 1 кнопки
+        List<InlineKeyboardButton> buttons1 = new ArrayList<>();
+
+        buttons1.add(new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter));
+        buttons.add(buttons1);
+//создаем лист 2 кнопки
+        List<InlineKeyboardButton> buttons2 = new ArrayList<>();
+
+        buttons2.add(new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет"));
+//        кидаем это все в главный лист
+        buttons.add(buttons2);
 
 
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter);
-        SendMessage sendMessage = new SendMessage(chatId, msg);
-        sendMessage.replyMarkup(inlineKeyboard);
-        telegramBot.execute(sendMessage);
-    }
+
+// какая библиотека? тут надо обьеденить чтоб было в боте и надо расскомитить
+    InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+//        keyboardMarkup.setKeyboard(buttons);
+
+    SendMessage sendMessage = new SendMessage(chatId, msg);
+    sendMessage.replyMarkup(keyboardMarkup);
+    telegramBot.execute(sendMessage);
+}
+
+// резерв
+//private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
+//    String msg = "Как мы можем вам помочь?";
+//    InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
+//            new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter),
+//            new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет https://t.me/axel_27")
+//    };
+//    //        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
+//    logger.warn("Пришел новый номер" + chatId);
+//
+//
+//    InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter);
+//    SendMessage sendMessage = new SendMessage(chatId, msg);
+//    sendMessage.replyMarkup(inlineKeyboard);
+//    telegramBot.execute(sendMessage);
+//}
+
 
     /**
      * Method to create menu Report

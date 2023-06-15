@@ -11,12 +11,6 @@ import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 public class ShelterVolunteerService {
 
-
-    //    public ShelterVolunteerService(VolunteerReposirory volunteerReposirory) {
-//        this.volunteerReposirory = volunteerReposirory;
-//    }
-//
-//    private final VolunteerReposirory volunteerReposirory;
     private final UsersRepository usersRepository;
     public ShelterVolunteerService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
