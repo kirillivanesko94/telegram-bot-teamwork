@@ -29,7 +29,6 @@ public class ShelterServiceTest {
     @Test
     void getInfoTest() {
         Shelter shelter = new Shelter();
-        shelter.setId(1L);
         shelter.setType(ShelterType.DOG);
         shelter.setName("собаки");
         shelter.setDescription("приют для собак");
@@ -45,7 +44,6 @@ public class ShelterServiceTest {
     @Test
     void getInfoIsNullTest() {
         Shelter shelter = new Shelter();
-        shelter.setId(1L);
         shelter.setType(ShelterType.DOG);
         shelter.setName("собаки");
         shelter.setInstruction("как забрать собаку");
@@ -54,6 +52,35 @@ public class ShelterServiceTest {
         String expected = null;
 
         String actual = shelterService.getInfo(ShelterType.DOG);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getInstructionTest() {
+        Shelter shelter = new Shelter();
+        shelter.setType(ShelterType.DOG);
+        shelter.setName("собаки");
+        shelter.setDescription("приют для собак");
+        shelter.setInstruction("как забрать собаку");
+
+        when(shelterRepository.findFirstByType(ShelterType.DOG)).thenReturn(Optional.of(shelter));
+        String expected = "как забрать собаку";
+
+        String actual = shelterService.getInstruction(ShelterType.DOG);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getInstructionNullTest() {
+        Shelter shelter = new Shelter();
+        shelter.setType(ShelterType.DOG);
+        shelter.setName("собаки");
+        shelter.setDescription("приют для собак");
+
+        when(shelterRepository.findFirstByType(ShelterType.DOG)).thenReturn(Optional.of(shelter));
+        String expected = null;
+
+        String actual = shelterService.getInstruction(ShelterType.DOG);
         assertEquals(expected, actual);
     }
 }
