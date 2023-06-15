@@ -23,7 +23,7 @@ public class Users {
 
     private String name;
     private String email;
-    private int phone;
+    private String phone;
     private Long chatId;
 
     /** Поле коллекция отчетов пользователя */
