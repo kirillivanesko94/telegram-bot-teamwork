@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import pro.sky.telegrambotshelter.listener.TelegramBotListener;
-import pro.sky.telegrambotshelter.repository.UsersRepository;
+import pro.sky.telegrambotshelter.repository.UserRepository;
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static pro.sky.telegrambotshelter.shelter.ShelterVolunteerType.VOLUNTEER;
 
 /**
@@ -22,7 +20,7 @@ import static pro.sky.telegrambotshelter.shelter.ShelterVolunteerType.VOLUNTEER;
 class ShelterVolunteerServiceTest {
 
     @MockBean
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
     private final ShelterVolunteerService shelterVolunteerService;
 
     @Autowired

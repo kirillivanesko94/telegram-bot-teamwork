@@ -68,19 +68,18 @@ VALUES ('Собачье сердце', 'Наш приют для собак на
     3. Финансовые ограничения
     4. Несоответствие задачам и потребностям животного.');
 
-CREATE TABLE usr
+CREATE TABLE "user"
 (
     id      BIGINT PRIMARY KEY,
     name    TEXT,
     email   TEXT,
     phone   TEXT,
-    chatId  BIGINT,
-    reports TEXT
+    chat_id  BIGINT
 );
 
 CREATE TABLE report
 (
     id         BIGINT,
     user_id    BIGINT,
-    reportText TEXT
+    report_text TEXT
 )

@@ -1,10 +1,8 @@
 package pro.sky.telegrambotshelter.service;
 
 import org.springframework.stereotype.Service;
-import pro.sky.telegrambotshelter.repository.ShelterRepository;
-import pro.sky.telegrambotshelter.repository.UsersRepository;
+import pro.sky.telegrambotshelter.repository.UserRepository;
 
-import pro.sky.telegrambotshelter.shelter.ShelterType;
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 @Service
@@ -17,9 +15,9 @@ public class ShelterVolunteerService {
 //    }
 //
 //    private final VolunteerReposirory volunteerReposirory;
-    private final UsersRepository usersRepository;
-    public ShelterVolunteerService(UsersRepository usersRepository) {
-        this.usersRepository = usersRepository;
+    private final UserRepository userRepository;
+    public ShelterVolunteerService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
     public String getInfoAboutQuestion(ShelterVolunteerType type) {
 
