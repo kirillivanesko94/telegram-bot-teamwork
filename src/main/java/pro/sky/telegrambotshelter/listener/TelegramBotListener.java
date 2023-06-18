@@ -23,7 +23,11 @@ import pro.sky.telegrambotshelter.shelter.ShelterType;
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
+
+
+
 
 /**
  * This class is responsible for handling incoming updates
@@ -112,6 +116,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for sending a welcome message
+     *
      * @param update received update
      */
     private void startMessage(Update update) {
@@ -119,11 +124,13 @@ public class TelegramBotListener implements UpdatesListener {
         String msg = "Привет, " + name + "! Пожалуйста, выбери приют:";
         long id = update.message().chat().id();
         InlineKeyboardButton[] buttonsRow = {
-                new InlineKeyboardButton(DOG_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_DOGS),
-                new InlineKeyboardButton(CAT_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_CATS),
+                new InlineKeyboardButton(DOG_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_DOGS)};
+        InlineKeyboardButton[] buttonsRow2 = {
+                new InlineKeyboardButton(CAT_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_CATS)};
+        InlineKeyboardButton[] buttonsRow3 = {
                 new InlineKeyboardButton(CALLBACK_VOLUNTEER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_VOLUNTEER),
         };
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRow);
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRow, buttonsRow2, buttonsRow3);
         SendMessage sendMessage = new SendMessage(id, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
@@ -131,6 +138,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for processing incoming
+     *
      * @param update received update
      */
 
@@ -170,11 +178,13 @@ public class TelegramBotListener implements UpdatesListener {
     private void createButtonInfoMenu(Long chatId, String callbackShowInfoDogs, String callbackShowInstructionDogs) {
         String msg = "Пожалуйста, выберете следующее действие";
         InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                new InlineKeyboardButton("Информация о питомнике").callbackData(callbackShowInfoDogs),
-                new InlineKeyboardButton("Информация о животных").callbackData(callbackShowInstructionDogs),
-                new InlineKeyboardButton("Отчет").callbackData("report"),
+                new InlineKeyboardButton("Информация о питомнике \uD83C\uDFD8 ").callbackData(callbackShowInfoDogs)};
+        InlineKeyboardButton[] buttonsRowForDogsShelter2 = {
+                new InlineKeyboardButton(" \uD83D\uDC15 Информация о животных \uD83D\uDC08").callbackData(callbackShowInstructionDogs)};
+        InlineKeyboardButton[] buttonsRowForDogsShelter3 = {
+                new InlineKeyboardButton("Отчет \uD83D\uDCDA ").callbackData("report"),
         };
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter, buttonsRowForDogsShelter2, buttonsRowForDogsShelter3);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
@@ -194,18 +204,20 @@ public class TelegramBotListener implements UpdatesListener {
         createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS, CALLBACK_SHOW_INSTRUCTION_DOGS);
     }
 
-    // для волонтера
+    // для волонтера и для резерва
     private void createButtonInfoVolunteerMenu(Long chatId) {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
-                new InlineKeyboardButton("тел гор линии 88005553535").callbackData(TelegramBotListener.CALLBACK_SHOW_INFO_VOLUNTEER),
-                new InlineKeyboardButton("Напишите в чат волонтеру!").url("https://t.me/axel_27")
+                new InlineKeyboardButton("тут Алексей принимает номер в БД")
+                        .callbackData(TelegramBotListener.CALLBACK_SHOW_INFO_VOLUNTEER)};
+        InlineKeyboardButton[] buttonsRowForVolunteerShelter2 = {
+                new InlineKeyboardButton("Напишите в чат волонтеру! ☎ ").url("https://t.me/axel_27")
         };
 //        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
         logger.warn("Пришел новый номер" + chatId);
 
 
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter);
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter,buttonsRowForVolunteerShelter2);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
