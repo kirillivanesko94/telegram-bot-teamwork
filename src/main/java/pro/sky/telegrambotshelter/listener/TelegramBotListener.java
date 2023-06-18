@@ -23,7 +23,6 @@ import pro.sky.telegrambotshelter.shelter.ShelterType;
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -112,7 +111,6 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for sending a welcome message
-     *
      * @param update received update
      */
     private void startMessage(Update update) {
@@ -160,7 +158,7 @@ public class TelegramBotListener implements UpdatesListener {
         } else if (CALLBACK_CHOOSE_SHELTER_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             createButtonInfoVolunteerMenu(chatId);
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
-            sendShelterVolunteerInfo(chatId, ShelterVolunteerType.VOLUNTEER);
+            sendShelterVolunteerInfo(chatId);
 
         } else if (CALLBACK_SHOW_INSTRUCTION_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterInstruction(chatId, ShelterType.DOG);
@@ -268,11 +266,11 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * method send info about volunteer
+     *
      * @param chatId - chat identifier
-     * @param type   - Shelter type (Enum)
      */
-    private void sendShelterVolunteerInfo(Long chatId, ShelterVolunteerType type) {
-        SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(type));
+    private void sendShelterVolunteerInfo(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(ShelterVolunteerType.VOLUNTEER));
         telegramBot.execute(sendMessage);
 
     }
@@ -344,16 +342,6 @@ public class TelegramBotListener implements UpdatesListener {
 
     private void failedMessage(Long chatId) {
         String msg = "Извините, я не понимаю что делать";
-        SendMessage sendMessage = new SendMessage(chatId, msg);
-        telegramBot.execute(sendMessage);
-    }
-
-    /**
-     * Method for entering the user's contacts into the database
-     * @param chatId - chat identifier
-     */
-    private void volMessage(Long chatId) {
-        String msg = "Тут надо в БД внести ваш номер(временная заглушка)";
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
     }

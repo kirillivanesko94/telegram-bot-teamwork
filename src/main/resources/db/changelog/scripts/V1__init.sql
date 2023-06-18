@@ -74,9 +74,11 @@ CREATE TABLE "user"
     name    TEXT,
     email   TEXT,
     phone   TEXT,
-    chat_id  BIGINT
-);
+    chat_id  BIGINT,
+    reports TEXT
 
+);
+insert into "user"(id, name, email, phone, chat_id) VALUES (1,'Kirill','aw@ya.ru','7888888888',902408510);
 CREATE TABLE report
 (
     id         BIGINT,
