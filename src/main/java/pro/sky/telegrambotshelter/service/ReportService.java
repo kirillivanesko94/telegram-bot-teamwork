@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.repository.ReportRepository;
-import pro.sky.telegrambotshelter.repository.UsersRepository;
+import pro.sky.telegrambotshelter.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -33,12 +33,12 @@ public class ReportService {
      * Method-constructor for DI
      */
     private final ReportRepository reportRepository;
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
     private final TelegramBot telegramBot;
 
-    public ReportService(ReportRepository reportRepository, UsersRepository usersRepository, TelegramBot telegramBot) {
+    public ReportService(ReportRepository reportRepository, UserRepository userRepository, TelegramBot telegramBot) {
         this.reportRepository = reportRepository;
-        this.usersRepository = usersRepository;
+        this.userRepository = userRepository;
         this.telegramBot = telegramBot;
     }
 
@@ -49,7 +49,7 @@ public class ReportService {
      */
     public void reportTextSave(Report report) {
         reportTmp.setReportText(report.getReportText());
-        reportTmp.setUsers(report.getUsers());
+        reportTmp.setUser(report.getUser());
     }
 
     /**
@@ -68,7 +68,7 @@ public class ReportService {
     public String reportCheck() {
         if (reportTmp.getFile() != null && reportTmp.getReportText() != null) {
             reportRepository.save(reportTmp);
-            timeOfLastReport.put(reportTmp.getUsers().getId(), LocalDateTime.now());
+            timeOfLastReport.put(reportTmp.getUser().getId(), LocalDateTime.now());
             reportTmp.setFile(null);
             reportTmp.setReportText(null);
             reportTmp.setId(null);
@@ -101,7 +101,7 @@ public class ReportService {
                 .forEach(x -> {
                     telegramBot.execute(
                             new SendMessage(
-                                    usersRepository.findById(x).get().getChatId(),
+                                    userRepository.findById(x).get().getChatId(),
                                     reminderMessage));
                 });
 
@@ -114,7 +114,7 @@ public class ReportService {
                 .forEach(x -> {
                     telegramBot.execute(
                             new SendMessage(
-                                    usersRepository.findById(x).get().getChatId(),
+                                    userRepository.findById(x).get().getChatId(),
                                     volunteerMessage));
                 });
 

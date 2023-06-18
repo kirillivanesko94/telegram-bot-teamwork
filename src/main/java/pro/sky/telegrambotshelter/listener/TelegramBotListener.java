@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
-import pro.sky.telegrambotshelter.entity.Users;
-import pro.sky.telegrambotshelter.repository.UsersRepository;
+import pro.sky.telegrambotshelter.entity.User;
+import pro.sky.telegrambotshelter.repository.UserRepository;
 import pro.sky.telegrambotshelter.service.PhotoService;
 import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
@@ -66,17 +66,17 @@ public class TelegramBotListener implements UpdatesListener {
     private final PhotoService photoService;
     private final ShelterVolunteerService shelterVolunteerService;
 
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
 
     public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService,
                                ReportService reportService, PhotoService photoService,
-                               ShelterVolunteerService shelterVolunteerService, UsersRepository usersRepository) {
+                               ShelterVolunteerService shelterVolunteerService, UserRepository userRepository) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
         this.reportService = reportService;
         this.photoService = photoService;
         this.shelterVolunteerService = shelterVolunteerService;
-        this.usersRepository = usersRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -296,8 +296,10 @@ public class TelegramBotListener implements UpdatesListener {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
         //заглушка - пока не будет реализовано сохранение user в БД
-        Users tmpUser = usersRepository.findByChatId(update.message().chat().id());
-        report.setUsers(tmpUser);
+        User fakeUser = new User();
+//        User tmpUser = userRepository.findByChatId(1067595342L);
+        fakeUser.setId(1L);
+        report.setUser(fakeUser);
         reportService.reportTextSave(report);
         String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);

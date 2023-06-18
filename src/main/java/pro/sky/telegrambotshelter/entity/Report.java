@@ -2,7 +2,6 @@ package pro.sky.telegrambotshelter.entity;
 
 import com.pengrad.telegrambot.model.File;
 import lombok.Data;
-import pro.sky.telegrambotshelter.entity.Photo;
 
 import javax.persistence.*;
 
@@ -20,8 +19,8 @@ public class Report {
 
     /** Field user */
     @ManyToOne
-    @JoinColumn(name = "users_id")
-    private Users users;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     /** Field report text */
     private String reportText;

@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 @Entity
 @Data
-public class Users {
+public class User {
     @Id
     @GeneratedValue
     private Long id;
@@ -27,7 +27,7 @@ public class Users {
     private Long chatId;
 
     /** Поле коллекция отчетов пользователя */
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private Collection<Report> reports;
 
 }
