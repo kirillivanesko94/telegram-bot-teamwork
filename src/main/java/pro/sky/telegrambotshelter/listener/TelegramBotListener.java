@@ -54,7 +54,6 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_VOLUNTEER_BUTTON = "Нужна помощь волонтера \uD83D\uDE4F";
     private static final String CALLBACK_CHOOSE_SHELTER_VOLUNTEER = "CALL_ME_VOLUNTEER";
     private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
-    // для конопки вызова инструкции
     private static final String CALLBACK_SHOW_INSTRUCTION_DOGS = "SHOW_INSTRUCTION_DOGS";
     private static final String CALLBACK_SHOW_INSTRUCTION_CATS = "SHOW_INSTRUCTION_CATS";
 
@@ -105,7 +104,6 @@ public class TelegramBotListener implements UpdatesListener {
             } else if (update.message() != null && "Отчет".equalsIgnoreCase(update.message().text().substring(0, 5))) {
                 saveReport(update);
             } else {
-                // Потенциально NPE потому что message может быть null
                 failedMessage(update.message().chat().id());
             }
         });
@@ -156,7 +154,7 @@ public class TelegramBotListener implements UpdatesListener {
 
 //            делаем волонтера
         } else if (CALLBACK_CHOOSE_SHELTER_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButtonInfoVolunteerMenu(chatId, CALLBACK_SHOW_INFO_VOLUNTEER);
+            createButtonInfoVolunteerMenu(chatId);
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterVolunteerInfo(chatId, ShelterVolunteerType.VOLUNTEER);
 
@@ -197,12 +195,11 @@ public class TelegramBotListener implements UpdatesListener {
     }
 
     // для волонтера
-    private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
+    private void createButtonInfoVolunteerMenu(Long chatId) {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
-                new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter),
-                new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").url("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
-
+                new InlineKeyboardButton("тел гор линии 88005553535").callbackData(TelegramBotListener.CALLBACK_SHOW_INFO_VOLUNTEER),
+                new InlineKeyboardButton("Напишите в чат волонтеру!").url("https://t.me/axel_27")
         };
 //        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
         logger.warn("Пришел новый номер" + chatId);
@@ -238,13 +235,7 @@ public class TelegramBotListener implements UpdatesListener {
      */
 
     private void sendShelterInfo(Long chatId, ShelterType type) {
-        //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
-//        InlineKeyboardButton[] buttonsRowForDogsShelter = {
-//                new InlineKeyboardButton(CALL_VOLUNTEER_BUTTON).callbackData(CALLBACK_CALL_VOLUNTEER),
-//        };
-//        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
-//        sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
     }
 
