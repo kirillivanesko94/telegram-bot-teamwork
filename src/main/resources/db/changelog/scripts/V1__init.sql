@@ -74,12 +74,12 @@ CREATE TABLE "user"
     name    TEXT,
     email   TEXT,
     phone   TEXT,
-    chatId  BIGINT
+    chat_id  BIGINT
 );
 
 CREATE TABLE report
 (
     id         BIGINT,
     user_id    BIGINT,
-    reportText TEXT
+    report_text TEXT
 )

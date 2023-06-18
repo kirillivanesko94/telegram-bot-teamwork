@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.entity.User;
 import pro.sky.telegrambotshelter.repository.UserRepository;
-import pro.sky.telegrambotshelter.service.PhotoService;
 import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
 import pro.sky.telegrambotshelter.service.ShelterVolunteerService;
@@ -63,18 +62,17 @@ public class TelegramBotListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
     private final ReportService reportService;
-    private final PhotoService photoService;
+
     private final ShelterVolunteerService shelterVolunteerService;
 
     private final UserRepository userRepository;
 
     public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService,
-                               ReportService reportService, PhotoService photoService,
+                               ReportService reportService,
                                ShelterVolunteerService shelterVolunteerService, UserRepository userRepository) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
         this.reportService = reportService;
-        this.photoService = photoService;
         this.shelterVolunteerService = shelterVolunteerService;
         this.userRepository = userRepository;
     }
@@ -203,7 +201,7 @@ public class TelegramBotListener implements UpdatesListener {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
                 new InlineKeyboardButton("тел гор линии 88005553535").callbackData(callbackShowInfoShelter),
-                new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
+                new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").url("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
 
         };
 //        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
