@@ -8,13 +8,6 @@ import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 @Service
 
 public class ShelterVolunteerService {
-
-
-    //    public ShelterVolunteerService(VolunteerReposirory volunteerReposirory) {
-//        this.volunteerReposirory = volunteerReposirory;
-//    }
-//
-//    private final VolunteerReposirory volunteerReposirory;
     private final UserRepository userRepository;
     public ShelterVolunteerService(UserRepository userRepository) {
         this.userRepository = userRepository;

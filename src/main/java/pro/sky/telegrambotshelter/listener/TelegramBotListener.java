@@ -155,8 +155,6 @@ public class TelegramBotListener implements UpdatesListener {
             sendReportMessage(chatId);
         } else if (CALLBACK_CHOOSE_FORM_REPORT.equalsIgnoreCase(update.callbackQuery().data())) {
             sendReportForm(chatId);
-
-//            делаем волонтера
         } else if (CALLBACK_CHOOSE_SHELTER_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             createButtonInfoVolunteerMenu(chatId);
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
