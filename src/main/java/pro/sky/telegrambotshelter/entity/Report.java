@@ -1,7 +1,6 @@
 package pro.sky.telegrambotshelter.entity;
 
 import lombok.Data;
-import pro.sky.telegrambotshelter.entity.Photo;
 
 import javax.persistence.*;
 

@@ -159,7 +159,11 @@ public class TelegramBotListener implements UpdatesListener {
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
     }
-    // для волонтера
+    /**
+     * Method for helping a volunteer
+     * @param chatId - chat identifier
+     * @param callbackShowInfoShelter - the assigned value of the button, for processing incoming CallbackQuery
+     */
     private void createButtonInfoVolunteerMenu(Long chatId, String callbackShowInfoShelter) {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
@@ -167,10 +171,7 @@ public class TelegramBotListener implements UpdatesListener {
                 new InlineKeyboardButton("Напишите в чат ваш вопрос, волонтер поможет!").switchInlineQuery("Напишите нашему волонтеру, он поможет https://t.me/axel_27"),
 
         };
-//        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
         logger.warn("Пришел новый номер" + chatId);
-
-
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
@@ -201,7 +202,6 @@ public class TelegramBotListener implements UpdatesListener {
      */
 
     private void sendShelterInfo(Long chatId, ShelterType type) {
-        //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
         InlineKeyboardButton[] buttonsRowForDogsShelter = {
                 new InlineKeyboardButton(CALL_VOLUNTEER_BUTTON).callbackData(CALLBACK_CALL_VOLUNTEER),
@@ -211,7 +211,11 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
-    //    для волонтера
+    /**
+     * Method returns information about the shelter
+     * @param chatId - chat identifier
+     * @param type - Shelter type (Enum)
+     */
     private void sendShelterVolunteerInfo(Long chatId, ShelterVolunteerType type) {
         SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(type));
         telegramBot.execute(sendMessage);
@@ -253,7 +257,11 @@ public class TelegramBotListener implements UpdatesListener {
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
     }
-    //для волонтера
+
+    /**
+     * Method for entering the user's contacts into the database
+     * @param chatId - chat identifier
+     */
     private void volMessage(Long chatId) {
         String msg = "Тут надо в БД внести ваш номер(временная заглушка)";
         SendMessage sendMessage = new SendMessage(chatId, msg);

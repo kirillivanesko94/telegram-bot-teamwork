@@ -4,7 +4,6 @@ import lombok.Data;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 
 /**
