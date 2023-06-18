@@ -51,10 +51,6 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_SHOW_MENU_REPORT = "REPORT";
     private static final String CALLBACK_CHOOSE_SEND_REPORT = "SEND_REPORT";
     private static final String CALLBACK_CHOOSE_FORM_REPORT = "FORM_REPORT";
-    private static final String CALLBACK_CALL_VOLUNTEER = "CALL_VOLUNTEER";
-    private static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтера";
-
-    //учимся звать волонтера и смайлы
     private static final String CALLBACK_VOLUNTEER_BUTTON = "Нужна помощь волонтера \uD83D\uDE4F";
     private static final String CALLBACK_CHOOSE_SHELTER_VOLUNTEER = "CALL_ME_VOLUNTEER";
     private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
@@ -175,6 +171,12 @@ public class TelegramBotListener implements UpdatesListener {
         }
     }
 
+    /**
+     * Method to create menu Info
+     * @param chatId - chat identifier
+     * @param callbackShowInfoDogs - shelter
+     * @param callbackShowInstructionDogs - shelter instructions
+     */
     private void createButtonInfoMenu(Long chatId, String callbackShowInfoDogs, String callbackShowInstructionDogs) {
         String msg = "Пожалуйста, выберете следующее действие";
         InlineKeyboardButton[] buttonsRowForDogsShelter = {
@@ -190,21 +192,27 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    /**
+     * Method to create menu for cat shelter
+     * @param chatId - chat identifier
+     */
     private void createButtonInfoMenuForCatShelter(Long chatId) {
         createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_CATS, CALLBACK_SHOW_INSTRUCTION_CATS);
     }
 
     /**
-     * Method to create menu Info
-     *
+     * Method to create for dog shelter
      * @param chatId - chat identifier
      */
 
     private void createButtonInfoMenuForDogShelter(Long chatId) {
         createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS, CALLBACK_SHOW_INSTRUCTION_DOGS);
     }
+    /**
+     * Method for helping a volunteer
+     * @param chatId - chat identifier
+     */
 
-    // для волонтера и для резерва
     private void createButtonInfoVolunteerMenu(Long chatId) {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
@@ -213,10 +221,7 @@ public class TelegramBotListener implements UpdatesListener {
         InlineKeyboardButton[] buttonsRowForVolunteerShelter2 = {
                 new InlineKeyboardButton("Напишите в чат волонтеру! ☎ ").url("https://t.me/axel_27")
         };
-//        пока временно появляется варн в консоли, надо из "сюда пиши позвоним -закинуть в БД номер"
         logger.warn("Пришел новый номер" + chatId);
-
-
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter,buttonsRowForVolunteerShelter2);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
@@ -251,12 +256,21 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
+    /**
+     * method for sending instruction
+     * @param chatId - chat identifier
+     * @param type   - Shelter type (Enum)
+     */
     private void sendShelterInstruction(Long chatId, ShelterType type) {
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInstruction(type));
         telegramBot.execute(sendMessage);
     }
 
-    //    для волонтера
+    /**
+     * method send info about volunteer
+     * @param chatId - chat identifier
+     * @param type   - Shelter type (Enum)
+     */
     private void sendShelterVolunteerInfo(Long chatId, ShelterVolunteerType type) {
         SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(type));
         telegramBot.execute(sendMessage);
@@ -296,9 +310,7 @@ public class TelegramBotListener implements UpdatesListener {
     private void saveReport(Update update) {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
-        //заглушка - пока не будет реализовано сохранение user в БД
         User fakeUser = new User();
-//        User tmpUser = userRepository.findByChatId(1067595342L);
         fakeUser.setId(1L);
         report.setUser(fakeUser);
         reportService.reportTextSave(report);
@@ -322,9 +334,6 @@ public class TelegramBotListener implements UpdatesListener {
         String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
         telegramBot.execute(sendMessage);
-//        SendPhoto sendPhoto = new SendPhoto(update.message().chat().id(), telegramBot.getFullFilePath(file));
-//        telegramBot.execute(sendPhoto);
-//        logger.info("Method sendPhoto was invoked");
     }
 
     /**
@@ -339,7 +348,10 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
     }
 
-    //для волонтера
+    /**
+     * Method for entering the user's contacts into the database
+     * @param chatId - chat identifier
+     */
     private void volMessage(Long chatId) {
         String msg = "Тут надо в БД внести ваш номер(временная заглушка)";
         SendMessage sendMessage = new SendMessage(chatId, msg);
