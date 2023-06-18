@@ -35,7 +35,7 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * logger to get information about the received update
      */
-    private Logger logger = LoggerFactory.getLogger(TelegramBotListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotListener.class);
     /**
      * constants for defining menu buttons in sent messages and designating CallbackQuery
      */
@@ -55,6 +55,10 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_VOLUNTEER_BUTTON = "Нужна помощь волонтера \uD83D\uDE4F";
     private static final String CALLBACK_CHOOSE_SHELTER_VOLUNTEER = "CALL_ME_VOLUNTEER";
     private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
+    // для конопки вызова инструкции
+    private static final String CALLBACK_SHOW_INSTRUCTION_DOGS = "SHOW_INSTRUCTION_DOGS";
+    private static final String CALLBACK_SHOW_INSTRUCTION_CATS = "SHOW_INSTRUCTION_CATS";
+
 
     private final TelegramBot telegramBot;
     private final ShelterService shelterService;
@@ -112,7 +116,6 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for sending a welcome message
-     *
      * @param update received update
      */
     private void startMessage(Update update) {
@@ -122,7 +125,6 @@ public class TelegramBotListener implements UpdatesListener {
         InlineKeyboardButton[] buttonsRow = {
                 new InlineKeyboardButton(DOG_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_DOGS),
                 new InlineKeyboardButton(CAT_SHELTER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_CATS),
-
                 new InlineKeyboardButton(CALLBACK_VOLUNTEER_BUTTON).callbackData(CALLBACK_CHOOSE_SHELTER_VOLUNTEER),
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRow);
@@ -133,7 +135,6 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for processing incoming
-     *
      * @param update received update
      */
 
@@ -141,9 +142,9 @@ public class TelegramBotListener implements UpdatesListener {
         Long chatId = update.callbackQuery().message().chat().id();
 
         if (CALLBACK_CHOOSE_SHELTER_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS);
+            createButtonInfoMenuForDogShelter(chatId);
         } else if (CALLBACK_CHOOSE_SHELTER_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
-            createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_CATS);
+            createButtonInfoMenuForCatShelter(chatId);
         } else if (CALLBACK_SHOW_INFO_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterInfo(chatId, ShelterType.DOG);
         } else if (CALLBACK_SHOW_INFO_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
@@ -161,29 +162,40 @@ public class TelegramBotListener implements UpdatesListener {
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterVolunteerInfo(chatId, ShelterVolunteerType.VOLUNTEER);
 
+        } else if (CALLBACK_SHOW_INSTRUCTION_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
+            sendShelterInstruction(chatId, ShelterType.DOG);
+        } else if (CALLBACK_SHOW_INSTRUCTION_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
+            sendShelterInstruction(chatId, ShelterType.CAT);
         } else {
             failedMessage(chatId);
         }
     }
 
-    /**
-     * Method to create menu Info
-     *
-     * @param chatId                  - chat identifier
-     * @param callbackShowInfoShelter - the assigned value of the button, for processing incoming CallbackQuery
-     */
-
-    private void createButtonInfoMenu(Long chatId, String callbackShowInfoShelter) {
+    private void createButtonInfoMenu(Long chatId, String callbackShowInfoDogs, String callbackShowInstructionDogs) {
         String msg = "Пожалуйста, выберете следующее действие";
         InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                new InlineKeyboardButton("Информация о питомнике").callbackData(callbackShowInfoShelter),
-                new InlineKeyboardButton("Информация о животных").callbackData("animal"),
+                new InlineKeyboardButton("Информация о питомнике").callbackData(callbackShowInfoDogs),
+                new InlineKeyboardButton("Информация о животных").callbackData(callbackShowInstructionDogs),
                 new InlineKeyboardButton("Отчет").callbackData("report"),
         };
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
+    }
+
+    private void createButtonInfoMenuForCatShelter(Long chatId) {
+        createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_CATS, CALLBACK_SHOW_INSTRUCTION_CATS);
+    }
+
+    /**
+     * Method to create menu Info
+     *
+     * @param chatId - chat identifier
+     */
+
+    private void createButtonInfoMenuForDogShelter(Long chatId) {
+        createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS, CALLBACK_SHOW_INSTRUCTION_DOGS);
     }
 
     // для волонтера
@@ -223,7 +235,6 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * method for sending information about the selected shelter
-     *
      * @param chatId - chat identifier
      * @param type   - Shelter type (Enum)
      */
@@ -231,11 +242,16 @@ public class TelegramBotListener implements UpdatesListener {
     private void sendShelterInfo(Long chatId, ShelterType type) {
         //TODO: Здесь нужно вызывать метод из сервиса, который в свою очередь берет информацию из БД.
         SendMessage sendMessage = new SendMessage(chatId, shelterService.getInfo(type));
-        InlineKeyboardButton[] buttonsRowForDogsShelter = {
-                new InlineKeyboardButton(CALL_VOLUNTEER_BUTTON).callbackData(CALLBACK_CALL_VOLUNTEER),
-        };
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
-        sendMessage.replyMarkup(inlineKeyboard);
+//        InlineKeyboardButton[] buttonsRowForDogsShelter = {
+//                new InlineKeyboardButton(CALL_VOLUNTEER_BUTTON).callbackData(CALLBACK_CALL_VOLUNTEER),
+//        };
+//        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForDogsShelter);
+//        sendMessage.replyMarkup(inlineKeyboard);
+        telegramBot.execute(sendMessage);
+    }
+
+    private void sendShelterInstruction(Long chatId, ShelterType type) {
+        SendMessage sendMessage = new SendMessage(chatId, shelterService.getInstruction(type));
         telegramBot.execute(sendMessage);
     }
 
@@ -245,7 +261,6 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
 
     }
-
     /**
      * Method to send info after clicking button Send Report
      *
@@ -312,7 +327,6 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * The method for sending the default message.
      * It is used in cases when the user has sent an unprocessed command
-     *
      * @param chatId - chat identifier
      */
 

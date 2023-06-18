@@ -33,4 +33,12 @@ public class ShelterService {
         log.info("в базе данных нет питомников с таким животным");
         return "Тут пока что пусто :(";
     }
+    public String getInstruction(ShelterType type) {
+        Optional<Shelter> shelter = shelterRepository.findFirstByType(type);
+        if (shelter.isPresent()){
+            return shelter.get().getInstruction();
+        }
+        log.info("в базе данных нет питомников с таким животным");
+        return "Тут пока что пусто :(";
+    }
 }
