@@ -12,4 +12,5 @@ import pro.sky.telegrambotshelter.entity.Users;
  * such as creating, reading, updating and deleting.
  */
 public interface UsersRepository extends JpaRepository<Users, Long> {
+    Users findByChatId(Long chatId);
 }
