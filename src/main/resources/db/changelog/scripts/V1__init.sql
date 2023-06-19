@@ -82,6 +82,6 @@ insert into users(id, name, email, phone, chat_id) VALUES (1,'Kirill','aw@ya.ru'
 CREATE TABLE report
 (
     id         BIGINT,
-    user_id    BIGINT,
+    users_id    BIGINT,
     report_text TEXT
 )
