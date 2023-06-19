@@ -3,6 +3,7 @@ package pro.sky.telegrambotshelter.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambotshelter.entity.Users;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
@@ -18,7 +19,13 @@ public class ShelterVolunteerService {
     }
     public String getInfoAboutQuestion(ShelterVolunteerType type) {
 
-        return "ВПожалуйста укажите ваш контактный номер телефона, в ближайшее время с вами свяжется волонтер, чтоб решить ваш вопрос. (заглушка)";
+        return "В ответном сообщении" +
+                " оставьте свой номер телефона" +
+                " и email в формате: \n +7 123 456 78 90 example@email.com";
+    }
+
+    public void saveUser(Users user) {
+        userRepository.save(user);
     }
 
     public void sendMessageSuccessfulProbation(Long chatId) {

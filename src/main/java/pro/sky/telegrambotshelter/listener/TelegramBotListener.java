@@ -12,7 +12,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.entity.Users;
@@ -25,8 +24,8 @@ import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /**
  * This class is responsible for handling incoming updates
  */
@@ -54,6 +53,7 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
     private static final String CALLBACK_SHOW_INSTRUCTION_DOGS = "SHOW_INSTRUCTION_DOGS";
     private static final String CALLBACK_SHOW_INSTRUCTION_CATS = "SHOW_INSTRUCTION_CATS";
+    private static final Pattern PATTERN = Pattern.compile("(^[+|8][0-9\\s]+)\\s(\\w*[@].+\\D$)");
 
 
     private final TelegramBot telegramBot;
@@ -101,6 +101,8 @@ public class TelegramBotListener implements UpdatesListener {
                 saveReportPhoto(update);
             } else if (update.message() != null && "Отчет".equalsIgnoreCase(update.message().text().substring(0, 5))) {
                 saveReport(update);
+            } else if (update.message() != null && checkMessagePattern(update.message().text())) {
+                saveUser(update);
             } else {
                 failedMessage(update.message().chat().id());
             }
@@ -159,7 +161,6 @@ public class TelegramBotListener implements UpdatesListener {
             createButtonInfoVolunteerMenu(chatId);
         } else if (CALLBACK_SHOW_INFO_VOLUNTEER.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterVolunteerInfo(chatId);
-
         } else if (CALLBACK_SHOW_INSTRUCTION_DOGS.equalsIgnoreCase(update.callbackQuery().data())) {
             sendShelterInstruction(chatId, ShelterType.DOG);
         } else if (CALLBACK_SHOW_INSTRUCTION_CATS.equalsIgnoreCase(update.callbackQuery().data())) {
@@ -219,7 +220,7 @@ public class TelegramBotListener implements UpdatesListener {
     private void createButtonInfoVolunteerMenu(Long chatId) {
         String msg = "Как мы можем вам помочь?";
         InlineKeyboardButton[] buttonsRowForVolunteerShelter = {
-                new InlineKeyboardButton("тут Алексей принимает номер в БД")
+                new InlineKeyboardButton("Оставить свои контактные данные")
                         .callbackData(TelegramBotListener.CALLBACK_SHOW_INFO_VOLUNTEER)};
         InlineKeyboardButton[] buttonsRowForVolunteerShelter2 = {
                 new InlineKeyboardButton("Напишите в чат волонтеру! ☎ ").url("https://t.me/axel_27")
@@ -360,6 +361,37 @@ public class TelegramBotListener implements UpdatesListener {
         String msg = "Извините, я не понимаю что делать";
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
+    }
+
+    private boolean checkMessagePattern(String text) {
+        Matcher matcher = PATTERN.matcher(text);
+        return matcher.matches();
+    }
+
+    private void saveUser(Update update) {
+        Users user = new Users();
+        String text = update.message().text();
+        Matcher matcher = PATTERN.matcher(text);
+
+        if (matcher.matches()) {
+            user.setName(update.message().chat().firstName());
+            user.setChatId(update.message().chat().id());
+            user.setPhone(matcher.group(1));
+            user.setEmail(matcher.group(2));
+
+            shelterVolunteerService.saveUser(user);
+
+            SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Данные успешно сохранены!\n" +
+                    "В ближайшее время с Вами свяжется волонтер");
+            telegramBot.execute(sendMessage);
+        } else {
+            SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Неверный формат номера телефона или email");
+            telegramBot.execute(sendMessage);
+        }
+
+
+
+
     }
 }
 
