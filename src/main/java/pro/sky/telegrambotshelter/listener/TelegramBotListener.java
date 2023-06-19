@@ -388,10 +388,15 @@ public class TelegramBotListener implements UpdatesListener {
             SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Неверный формат номера телефона или email");
             telegramBot.execute(sendMessage);
         }
+    }
 
-
-
-
+    public void sendMessageFromVolunteer(Long chatId, String message){
+        try {
+            SendMessage sendMessage = new SendMessage(chatId, message);
+            telegramBot.execute(sendMessage);
+        }catch (Exception e){
+            logger.error("чат не существует " + chatId);
+        }
     }
 }
 
