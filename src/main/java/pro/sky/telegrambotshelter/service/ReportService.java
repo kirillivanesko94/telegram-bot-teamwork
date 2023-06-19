@@ -49,7 +49,7 @@ public class ReportService {
      */
     public void reportTextSave(Report report) {
         reportTmp.setReportText(report.getReportText());
-        reportTmp.setUser(report.getUser());
+        reportTmp.setUsers(report.getUsers());
     }
 
     /**
@@ -68,7 +68,7 @@ public class ReportService {
     public String reportCheck() {
         if (reportTmp.getFile() != null && reportTmp.getReportText() != null) {
             reportRepository.save(reportTmp);
-            timeOfLastReport.put(reportTmp.getUser().getId(), LocalDateTime.now());
+            timeOfLastReport.put(reportTmp.getUsers().getId(), LocalDateTime.now());
             reportTmp.setFile(null);
             reportTmp.setReportText(null);
             reportTmp.setId(null);

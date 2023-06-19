@@ -68,7 +68,7 @@ VALUES ('Собачье сердце', 'Наш приют для собак на
     3. Финансовые ограничения
     4. Несоответствие задачам и потребностям животного.');
 
-CREATE TABLE "user"
+CREATE TABLE users
 (
     id      BIGINT PRIMARY KEY,
     name    TEXT,
@@ -78,7 +78,7 @@ CREATE TABLE "user"
     reports TEXT
 
 );
-insert into "user"(id, name, email, phone, chat_id) VALUES (1,'Kirill','aw@ya.ru','7888888888',902408510);
+insert into users(id, name, email, phone, chat_id) VALUES (1,'Kirill','aw@ya.ru','7888888888',902408510);
 CREATE TABLE report
 (
     id         BIGINT,
