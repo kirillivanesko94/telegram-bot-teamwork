@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.entity.Users;
@@ -24,8 +25,6 @@ import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-
-
 
 
 /**
@@ -111,6 +110,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method for sending a welcome message
+     *
      * @param update received update
      */
     private void startMessage(Update update) {
@@ -171,8 +171,9 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to create menu Info
-     * @param chatId - chat identifier
-     * @param callbackShowInfoDogs - shelter
+     *
+     * @param chatId                      - chat identifier
+     * @param callbackShowInfoDogs        - shelter
      * @param callbackShowInstructionDogs - shelter instructions
      */
     private void createButtonInfoMenu(Long chatId, String callbackShowInfoDogs, String callbackShowInstructionDogs) {
@@ -192,6 +193,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to create menu for cat shelter
+     *
      * @param chatId - chat identifier
      */
     private void createButtonInfoMenuForCatShelter(Long chatId) {
@@ -200,14 +202,17 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * Method to create for dog shelter
+     *
      * @param chatId - chat identifier
      */
 
     private void createButtonInfoMenuForDogShelter(Long chatId) {
         createButtonInfoMenu(chatId, CALLBACK_SHOW_INFO_DOGS, CALLBACK_SHOW_INSTRUCTION_DOGS);
     }
+
     /**
      * Method for helping a volunteer
+     *
      * @param chatId - chat identifier
      */
 
@@ -220,7 +225,7 @@ public class TelegramBotListener implements UpdatesListener {
                 new InlineKeyboardButton("Напишите в чат волонтеру! ☎ ").url("https://t.me/axel_27")
         };
         logger.warn("Пришел новый номер" + chatId);
-        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter,buttonsRowForVolunteerShelter2);
+        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(buttonsRowForVolunteerShelter, buttonsRowForVolunteerShelter2);
         SendMessage sendMessage = new SendMessage(chatId, msg);
         sendMessage.replyMarkup(inlineKeyboard);
         telegramBot.execute(sendMessage);
@@ -245,6 +250,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * method for sending information about the selected shelter
+     *
      * @param chatId - chat identifier
      * @param type   - Shelter type (Enum)
      */
@@ -256,6 +262,7 @@ public class TelegramBotListener implements UpdatesListener {
 
     /**
      * method for sending instruction
+     *
      * @param chatId - chat identifier
      * @param type   - Shelter type (Enum)
      */
@@ -274,6 +281,7 @@ public class TelegramBotListener implements UpdatesListener {
         telegramBot.execute(sendMessage);
 
     }
+
     /**
      * Method to send info after clicking button Send Report
      *
@@ -308,9 +316,16 @@ public class TelegramBotListener implements UpdatesListener {
     private void saveReport(Update update) {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
-        Users fakeUsers = new Users();
-        fakeUsers.setId(5L);
-        report.setUsers(fakeUsers);
+        Users tmpUser = userRepository.findByChatId(update.message().chat().id());
+        if (tmpUser == null) {
+            String msg = "Отчет не принят, так как мы обнаружили, что текущий пользователь не зарегистрирован. " +
+                    "Для корректной работы приложения - пожалуйста, зарегистрируйтесь в стартовом меню" +
+                    " \"Нужна помощь волонтера\", спасибо)";
+            SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
+            telegramBot.execute(sendMessage);
+            return;
+        }
+        report.setUsers(tmpUser);
         reportService.reportTextSave(report);
         String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
@@ -337,6 +352,7 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * The method for sending the default message.
      * It is used in cases when the user has sent an unprocessed command
+     *
      * @param chatId - chat identifier
      */
 
