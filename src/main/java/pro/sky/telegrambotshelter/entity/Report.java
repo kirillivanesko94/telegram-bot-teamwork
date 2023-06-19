@@ -17,10 +17,10 @@ public class Report {
     @GeneratedValue
     private Long id;
 
-    /** Field user */
+    /** Field users */
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "users_id")
+    private Users users;
 
     /** Field report text */
     private String reportText;

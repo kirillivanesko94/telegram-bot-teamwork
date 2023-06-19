@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
-import pro.sky.telegrambotshelter.entity.User;
+import pro.sky.telegrambotshelter.entity.Users;
 import pro.sky.telegrambotshelter.repository.UserRepository;
 import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
@@ -308,9 +308,9 @@ public class TelegramBotListener implements UpdatesListener {
     private void saveReport(Update update) {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
-        User fakeUser = new User();
-        fakeUser.setId(1L);
-        report.setUser(fakeUser);
+        Users fakeUsers = new Users();
+        fakeUsers.setId(1L);
+        report.setUsers(fakeUsers);
         reportService.reportTextSave(report);
         String msg = reportService.reportCheck();
         SendMessage sendMessage = new SendMessage(update.message().chat().id(), msg);
