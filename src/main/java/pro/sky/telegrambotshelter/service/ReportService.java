@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
@@ -63,11 +64,16 @@ public class ReportService {
 
     /**
      * Method to check temporary report
-     *
      */
     public String reportCheck() {
         if (reportTmp.getFile() != null && reportTmp.getReportText() != null) {
-            reportRepository.save(reportTmp);
+            try {
+                reportRepository.save(reportTmp);
+            } catch (DataIntegrityViolationException e) {
+                return "Отчет не принят, так как мы обнаружили, что текущий пользователь не зарегистрирован. " +
+                "Для корректной работы приложения - пожалуйста, зарегистрируйтесь в стартовом меню" +
+                " \"Нужна помощь волонтера\", спасибо)";
+            }
             timeOfLastReport.put(reportTmp.getUsers().getId(), LocalDateTime.now());
             reportTmp.setFile(null);
             reportTmp.setReportText(null);
@@ -84,7 +90,6 @@ public class ReportService {
 
     /**
      * Method to check reports was sent in-time
-     *
      */
     @Scheduled(cron = "0 0/1 * * * *")
     private void reportReminder() {

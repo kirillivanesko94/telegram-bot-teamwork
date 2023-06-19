@@ -309,7 +309,7 @@ public class TelegramBotListener implements UpdatesListener {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
         Users fakeUsers = new Users();
-        fakeUsers.setId(1L);
+        fakeUsers.setId(5L);
         report.setUsers(fakeUsers);
         reportService.reportTextSave(report);
         String msg = reportService.reportCheck();
@@ -325,7 +325,7 @@ public class TelegramBotListener implements UpdatesListener {
     private void saveReportPhoto(Update update) {
         PhotoSize[] photo = update.message().photo();
 
-        GetFile request = new GetFile(photo[3].fileId());
+        GetFile request = new GetFile(photo[1].fileId());
         GetFileResponse getFileResponse = telegramBot.execute(request);
         File file = getFileResponse.file();
         reportService.reportPhotoSave(file);
