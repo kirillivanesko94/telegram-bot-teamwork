@@ -1,11 +1,15 @@
 package pro.sky.telegrambotshelter.controller;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import pro.sky.telegrambotshelter.entity.Users;
 import pro.sky.telegrambotshelter.service.ShelterVolunteerService;
+
+import java.util.Collection;
 
 @RestController
 @RequestMapping("volunteer")
@@ -58,6 +62,17 @@ public class VolunteerController {
     @PostMapping("Bad-Report")
     public void sendMessageBadReport(@RequestParam Long chatId){
         shelterVolunteerService.sendMessageBadReport(chatId);
+    }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "the method get all users",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE)
+    )
+    @GetMapping("all-users")
+    public Collection<Users> getAllUsers(){
+        return shelterVolunteerService.getAllUsers();
     }
 
 }

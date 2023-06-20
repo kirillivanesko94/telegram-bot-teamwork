@@ -4,17 +4,19 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Users;
-import pro.sky.telegrambotshelter.repository.UserRepository;
+import pro.sky.telegrambotshelter.repository.UsersRepository;
 
 import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
+
+import java.util.Collection;
 
 @Service
 
 public class ShelterVolunteerService {
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
     private final TelegramBot telegramBot;
-    public ShelterVolunteerService(UserRepository userRepository, TelegramBot telegramBot) {
-        this.userRepository = userRepository;
+    public ShelterVolunteerService(UsersRepository usersRepository, TelegramBot telegramBot) {
+        this.usersRepository = usersRepository;
         this.telegramBot = telegramBot;
     }
     public String getInfoAboutQuestion(ShelterVolunteerType type) {
@@ -25,7 +27,7 @@ public class ShelterVolunteerService {
     }
 
     public void saveUser(Users user) {
-        userRepository.save(user);
+        usersRepository.save(user);
     }
 
     public void sendMessageSuccessfulProbation(Long chatId) {
@@ -58,6 +60,10 @@ public class ShelterVolunteerService {
                 "В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного";
         SendMessage sendMessage = new SendMessage(chatId, msg);
         telegramBot.execute(sendMessage);
+    }
+
+    public Collection<Users> getAllUsers() {
+        return usersRepository.findAll();
     }
 
 
