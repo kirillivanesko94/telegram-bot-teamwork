@@ -3,8 +3,10 @@ package pro.sky.telegrambotshelter.entity;
 import lombok.Data;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
 
-import javax.persistence.*;
-import java.util.Collection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 
 
 /**

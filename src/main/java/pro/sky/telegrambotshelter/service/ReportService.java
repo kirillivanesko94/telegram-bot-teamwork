@@ -26,10 +26,10 @@ public class ReportService {
     /**
      * Field to temporary store fields of report
      */
-    private Logger logger = LoggerFactory.getLogger(ReportService.class);
+    private final Logger logger = LoggerFactory.getLogger(ReportService.class);
     private Report reportTmp = new Report();
 
-    private Map<Long, LocalDateTime> timeOfLastReport = new HashMap<>();
+    private final Map<Long, LocalDateTime> timeOfLastReport = new HashMap<>();
 
     /**
      * Method-constructor for DI
@@ -47,7 +47,7 @@ public class ReportService {
     /**
      * Method to save report text
      *
-     * @param report - report from chat-bot
+     * @param report - report from telegram bot
      */
     public void reportTextSave(Report report) {
         reportTmp.setReportText(report.getReportText());
@@ -57,7 +57,7 @@ public class ReportService {
     /**
      * Method to save report photo
      *
-     * @param file - photo from chat-bot
+     * @param file - photo from telegram bot
      */
     public void reportPhotoSave(File file) {
         reportTmp.setFile(file);
@@ -72,8 +72,8 @@ public class ReportService {
                 reportRepository.save(reportTmp);
             } catch (DataIntegrityViolationException e) {
                 return "Отчет не принят, так как мы обнаружили, что текущий пользователь не зарегистрирован. " +
-                "Для корректной работы приложения - пожалуйста, зарегистрируйтесь в стартовом меню" +
-                " \"Нужна помощь волонтера\", спасибо)";
+                        "Для корректной работы приложения - пожалуйста, зарегистрируйтесь в стартовом меню" +
+                        " \"Нужна помощь волонтера\", спасибо)";
             }
             timeOfLastReport.put(reportTmp.getUsers().getId(), LocalDateTime.now());
             reportTmp.setFile(null);
