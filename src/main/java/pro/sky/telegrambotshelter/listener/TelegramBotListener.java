@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.entity.Users;
-import pro.sky.telegrambotshelter.repository.UserRepository;
+import pro.sky.telegrambotshelter.repository.UsersRepository;
 import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
 import pro.sky.telegrambotshelter.service.ShelterVolunteerService;
@@ -62,16 +62,16 @@ public class TelegramBotListener implements UpdatesListener {
 
     private final ShelterVolunteerService shelterVolunteerService;
 
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     public TelegramBotListener(TelegramBot telegramBot, ShelterService shelterService,
                                ReportService reportService,
-                               ShelterVolunteerService shelterVolunteerService, UserRepository userRepository) {
+                               ShelterVolunteerService shelterVolunteerService, UsersRepository usersRepository) {
         this.telegramBot = telegramBot;
         this.shelterService = shelterService;
         this.reportService = reportService;
         this.shelterVolunteerService = shelterVolunteerService;
-        this.userRepository = userRepository;
+        this.usersRepository = usersRepository;
     }
 
     /**
@@ -317,7 +317,7 @@ public class TelegramBotListener implements UpdatesListener {
     private void saveReport(Update update) {
         Report report = new Report();
         report.setReportText(update.message().text().substring(5));
-        Users tmpUser = userRepository.findByChatId(update.message().chat().id());
+        Users tmpUser = usersRepository.findByChatId(update.message().chat().id());
         if (tmpUser == null) {
             String msg = "Отчет не принят, так как мы обнаружили, что текущий пользователь не зарегистрирован. " +
                     "Для корректной работы приложения - пожалуйста, зарегистрируйтесь в стартовом меню" +

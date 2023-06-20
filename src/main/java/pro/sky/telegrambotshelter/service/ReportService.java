@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Report;
 import pro.sky.telegrambotshelter.repository.ReportRepository;
-import pro.sky.telegrambotshelter.repository.UserRepository;
+import pro.sky.telegrambotshelter.repository.UsersRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,18 +28,19 @@ public class ReportService {
      */
     private Logger logger = LoggerFactory.getLogger(ReportService.class);
     private Report reportTmp = new Report();
+
     private Map<Long, LocalDateTime> timeOfLastReport = new HashMap<>();
 
     /**
      * Method-constructor for DI
      */
     private final ReportRepository reportRepository;
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
     private final TelegramBot telegramBot;
 
-    public ReportService(ReportRepository reportRepository, UserRepository userRepository, TelegramBot telegramBot) {
+    public ReportService(ReportRepository reportRepository, UsersRepository usersRepository, TelegramBot telegramBot) {
         this.reportRepository = reportRepository;
-        this.userRepository = userRepository;
+        this.usersRepository = usersRepository;
         this.telegramBot = telegramBot;
     }
 
@@ -106,7 +107,7 @@ public class ReportService {
                 .forEach(x -> {
                     telegramBot.execute(
                             new SendMessage(
-                                    userRepository.findById(x).get().getChatId(),
+                                    usersRepository.findById(x).get().getChatId(),
                                     reminderMessage));
                 });
 
@@ -119,9 +120,12 @@ public class ReportService {
                 .forEach(x -> {
                     telegramBot.execute(
                             new SendMessage(
-                                    userRepository.findById(x).get().getChatId(),
+                                    usersRepository.findById(x).get().getChatId(),
                                     volunteerMessage));
                 });
+    }
 
+    public void setReportTmp(Report reportTmp) {
+        this.reportTmp = reportTmp;
     }
 }
