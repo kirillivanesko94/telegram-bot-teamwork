@@ -20,12 +20,12 @@ import pro.sky.telegrambotshelter.service.ReportService;
 import pro.sky.telegrambotshelter.service.ShelterService;
 import pro.sky.telegrambotshelter.service.ShelterVolunteerService;
 import pro.sky.telegrambotshelter.shelter.ShelterType;
-import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 /**
  * This class is responsible for handling incoming updates
  */
@@ -53,7 +53,7 @@ public class TelegramBotListener implements UpdatesListener {
     private static final String CALLBACK_SHOW_INFO_VOLUNTEER = "INFO_VOLUNTEER";
     private static final String CALLBACK_SHOW_INSTRUCTION_DOGS = "SHOW_INSTRUCTION_DOGS";
     private static final String CALLBACK_SHOW_INSTRUCTION_CATS = "SHOW_INSTRUCTION_CATS";
-    private static final Pattern PATTERN = Pattern.compile("(^[+|8][0-9\\s]+)\\s(\\w*[@].+\\D$)");
+    private static final Pattern PATTERN = Pattern.compile("(^[+|8][0-9\\s]+)\\s(\\w*@.+\\D$)");
 
 
     private final TelegramBot telegramBot;
@@ -278,7 +278,7 @@ public class TelegramBotListener implements UpdatesListener {
      * @param chatId - chat identifier
      */
     private void sendShelterVolunteerInfo(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion(ShelterVolunteerType.VOLUNTEER));
+        SendMessage sendMessage = new SendMessage(chatId, shelterVolunteerService.getInfoAboutQuestion());
         telegramBot.execute(sendMessage);
 
     }
@@ -312,7 +312,7 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * Method to save report text
      *
-     * @param update - update from chat-bot
+     * @param update - update from telegram bot
      */
     private void saveReport(Update update) {
         Report report = new Report();
@@ -336,7 +336,7 @@ public class TelegramBotListener implements UpdatesListener {
     /**
      * Method to save report photo
      *
-     * @param update - update from chat-bot
+     * @param update - update from telegram bot
      */
     private void saveReportPhoto(Update update) {
         PhotoSize[] photo = update.message().photo();
@@ -387,15 +387,6 @@ public class TelegramBotListener implements UpdatesListener {
         } else {
             SendMessage sendMessage = new SendMessage(update.message().chat().id(), "Неверный формат номера телефона или email");
             telegramBot.execute(sendMessage);
-        }
-    }
-
-    public void sendMessageFromVolunteer(Long chatId, String message){
-        try {
-            SendMessage sendMessage = new SendMessage(chatId, message);
-            telegramBot.execute(sendMessage);
-        }catch (Exception e){
-            logger.error("чат не существует " + chatId);
         }
     }
 }

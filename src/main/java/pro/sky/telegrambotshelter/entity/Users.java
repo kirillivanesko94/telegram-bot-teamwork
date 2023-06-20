@@ -24,7 +24,9 @@ public class Users {
     private String phone;
     private Long chatId;
 
-    /** Поле коллекция отчетов пользователя */
+    /**
+     * Поле коллекция отчетов пользователя
+     */
     @OneToMany(mappedBy = "users")
     @JsonIgnore
     private Collection<Report> reports;

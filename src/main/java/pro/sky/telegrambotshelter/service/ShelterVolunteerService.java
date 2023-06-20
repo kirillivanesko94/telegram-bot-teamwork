@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import pro.sky.telegrambotshelter.entity.Users;
 import pro.sky.telegrambotshelter.repository.UsersRepository;
 
-import pro.sky.telegrambotshelter.shelter.ShelterVolunteerType;
-
 import java.util.Collection;
 
 @Service
@@ -15,11 +13,13 @@ import java.util.Collection;
 public class ShelterVolunteerService {
     private final UsersRepository usersRepository;
     private final TelegramBot telegramBot;
+
     public ShelterVolunteerService(UsersRepository usersRepository, TelegramBot telegramBot) {
         this.usersRepository = usersRepository;
         this.telegramBot = telegramBot;
     }
-    public String getInfoAboutQuestion(ShelterVolunteerType type) {
+
+    public String getInfoAboutQuestion() {
 
         return "В ответном сообщении" +
                 " оставьте свой номер телефона" +
@@ -65,10 +65,6 @@ public class ShelterVolunteerService {
     public Collection<Users> getAllUsers() {
         return usersRepository.findAll();
     }
-
-
-
-
 
 
 }

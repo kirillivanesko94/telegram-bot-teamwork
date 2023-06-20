@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.postgresql.hostchooser.HostRequirement.any;
 import static pro.sky.telegrambotshelter.shelter.ShelterVolunteerType.VOLUNTEER;
 
 /**
@@ -49,7 +48,7 @@ class ShelterVolunteerServiceTest {
                 " и email в формате: \n +7 123 456 78 90 example@email.com";
         ShelterVolunteerType type = VOLUNTEER;
 
-        Assertions.assertEquals(expectedResult, shelterVolunteerService.getInfoAboutQuestion(type));
+        Assertions.assertEquals(expectedResult, shelterVolunteerService.getInfoAboutQuestion());
     }
 
     /**

@@ -22,20 +22,21 @@ public class ShelterService {
 
     /**
      * Method for obtaining information about the nursery, depending on the selected type
-     * @param type - Shelter type
      *
+     * @param type - Shelter type
      */
     public String getInfo(ShelterType type) {
         Optional<Shelter> shelter = shelterRepository.findFirstByType(type);
-        if (shelter.isPresent()){
+        if (shelter.isPresent()) {
             return shelter.get().getDescription();
         }
         log.info("в базе данных нет питомников с таким животным");
         return "Тут пока что пусто :(";
     }
+
     public String getInstruction(ShelterType type) {
         Optional<Shelter> shelter = shelterRepository.findFirstByType(type);
-        if (shelter.isPresent()){
+        if (shelter.isPresent()) {
             return shelter.get().getInstruction();
         }
         log.info("в базе данных нет питомников с таким животным");
