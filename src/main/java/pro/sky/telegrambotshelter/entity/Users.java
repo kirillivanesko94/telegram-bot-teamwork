@@ -1,11 +1,9 @@
 package pro.sky.telegrambotshelter.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Collection;
 
 /**
@@ -28,6 +26,7 @@ public class Users {
 
     /** Поле коллекция отчетов пользователя */
     @OneToMany(mappedBy = "users")
+    @JsonIgnore
     private Collection<Report> reports;
 
 }

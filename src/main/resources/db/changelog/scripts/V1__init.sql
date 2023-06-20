@@ -74,8 +74,7 @@ CREATE TABLE users
     name    TEXT,
     email   TEXT,
     phone   TEXT,
-    chat_id  BIGINT,
-    reports TEXT
+    chat_id  BIGINT
 
 );
 
@@ -83,5 +82,6 @@ CREATE TABLE report
 (
     id         BIGINT,
     users_id    BIGINT,
-    report_text TEXT
+    report_text TEXT,
+    FOREIGN KEY (users_id) REFERENCES users(id)
 )
