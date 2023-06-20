@@ -33,7 +33,10 @@ public class ShelterService {
         log.info("в базе данных нет питомников с таким животным");
         return "Тут пока что пусто :(";
     }
-
+    /**
+     * Method for obtaining information about the instruction, depending on the selected type
+     * @param type - Shelter type
+     */
     public String getInstruction(ShelterType type) {
         Optional<Shelter> shelter = shelterRepository.findFirstByType(type);
         if (shelter.isPresent()) {
